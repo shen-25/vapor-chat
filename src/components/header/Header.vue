@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Tab from "@/components/tab/Tab";
+import Tab from "./Tab";
 export default {
   name: "Header",
   components: {

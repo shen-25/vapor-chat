@@ -3,28 +3,29 @@
   <div class="videoPlayer">
     <Player class="video" />
   </div>
+  <Footer />
 </template>
 <script>
 // @ is an alias to /src
 import Player from "@/components/player/Player.vue";
+import Footer from "@/components/footer/Footer.vue";
 
 export default {
   name: "HomeView",
   components: {
     Player,
+    Footer,
   },
 };
 </script>
 <style lang="scss" scoped>
 .videoPlayer {
+  width: 100%;
+
+  display: block;
   position: absolute;
-  top: 44px;
-  left: 0px;
-  right: 0px;
-  bottom: 24px;
-  max-height: 100%;
-  max-width: 100%;
-  margin: 0 auto auto auto;
+  top: 0px;
+  bottom: 48px;
   .video {
     display: flex;
     width: 100%;

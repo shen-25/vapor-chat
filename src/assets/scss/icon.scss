@@ -1,17 +1,27 @@
+// @font-face {
+//   font-family: "chat-icon";
+//   src: url("../fonts/chat-icon.eot?2qevqt");
+//   src: url("../fonts/chat-icon.eot?2qevqt#iefix") format("embedded-opentype"),
+//     // url("../fonts/iconfont.ttf?2qevqt") format("truetype"),
+//     // url("../fonts/iconfont.woff?2qevqt") format("woff"),
+//     url("../fonts/chat-icon.svg?2qevqt#chat-icon") format("svg"),
+//     //网站
+//     url("//at.alicdn.com/t/c/font_4431305_drqyx1a2poh.woff?t=1706886712835")
+//       format("woff"),
+//     url("//at.alicdn.com/t/c/font_4431305_drqyx1a2poh.ttf?t=1706886712835")
+//       format("truetype");
+//   font-weight: normal;
+//   font-style: normal;
+// }
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
-  font-family: "chat-icon";
-  src: url("../fonts/chat-icon.eot?2qevqt");
-  src: url("../fonts/chat-icon.eot?2qevqt#iefix") format("embedded-opentype"),
-    // url("../fonts/iconfont.ttf?2qevqt") format("truetype"),
-    // url("../fonts/iconfont.woff?2qevqt") format("woff"),
-    url("../fonts/chat-icon.svg?2qevqt#chat-icon") format("svg"),
-    //网站
-    url("//at.alicdn.com/t/c/font_4431305_drqyx1a2poh.woff?t=1706886712835")
+  font-family: "chat-icon"; /* Project id 4431305 */
+  src: url("//at.alicdn.com/t/c/font_4431305_94weq7o8hkt.woff2?t=1709966581452")
+      format("woff2"),
+    url("//at.alicdn.com/t/c/font_4431305_94weq7o8hkt.woff?t=1709966581452")
       format("woff"),
-    url("//at.alicdn.com/t/c/font_4431305_drqyx1a2poh.ttf?t=1706886712835")
+    url("//at.alicdn.com/t/c/font_4431305_94weq7o8hkt.ttf?t=1709966581452")
       format("truetype");
-  font-weight: normal;
-  font-style: normal;
 }
 
 [class^="icon-"],
@@ -36,4 +46,29 @@
 
 .icon-nav:before {
   content: "\e660";
+}
+.icon-shop:before {
+  content: "\e601";
+}
+.icon-more:before {
+  content: "\e64c";
+}
+.icon-group-chat:before {
+  content: "\e661";
+}
+.icon-music:before {
+  content: "\e607";
+}
+.icon-navigation:before {
+  content: "\e600";
+}
+.icon-edit:before {
+  content: "\e613";
+}
+.icon-back:before {
+  content: "\e602";
+}
+
+.icon-right-back:before {
+  content: "\e6b5";
 }

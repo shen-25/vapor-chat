@@ -7,13 +7,21 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@better-scroll/core": "^2.2.1",
+    "@better-scroll/observe-dom": "^2.2.1",
+    "@better-scroll/pull-up": "^2.2.1",
+    "@better-scroll/slide": "^2.2.1",
+    "@vant/area-data": "^1.5.1",
     "core-js": "^3.8.3",
+    "lodash-es": "^4.17.21",
+    "vant": "^4.8.5",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0",
     "xgplayer": "^2.31.6"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",

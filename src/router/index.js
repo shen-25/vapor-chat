@@ -1,21 +1,63 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import EditUserInfoItem from "@/views/me/userinfo/EditUserInfoItem";
+
 const routes = [
   {
     path: "/",
-    name: "home",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    name: "Home",
+    component: () =>
+      import(/* webpackChunkName: "HomeView" */ "@/views/HomeView.vue"),
   },
   {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    path: "/friend",
+    name: "Friend",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+      import(/* webpackChunkName: "Singer" */ "@/views/friend/index.vue"),
+  },
+  {
+    path: "/upload-content",
+    name: "UploadContent",
+    component: () =>
+      import(
+        /* webpackChunkName: "Singer" */ "@/views/upload-content/index.vue"
+      ),
+  },
+  {
+    path: "/message",
+    name: "Message",
+    component: () =>
+      import(/* webpackChunkName: "Singer" */ "@/views/message/index.vue"),
+  },
+  {
+    path: "/me",
+    name: "Me",
+    component: () =>
+      import(/* webpackChunkName: "Singer" */ "@/views/me/index.vue"),
+    children: [
+      {
+        path: "edit-userinfo",
+        name: "meEditUserInfo",
+        component: () =>
+          import(
+            /* webpackChunkName: "EditUserInfo" */ "@/views/me/userinfo/EditUserInfo.vue"
+          ),
+        children: [
+          {
+            path: ":id",
+            component: EditUserInfoItem,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/me/edit/chooseSchool",
+    name: "chooseSchool",
+    component: () =>
+      import(
+        /* webpackChunkName: "ChooseSchool" */ "@/views/me/userinfo/ChooseSchool.vue"
+      ),
   },
 ];
 
