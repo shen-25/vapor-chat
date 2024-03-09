@@ -12,7 +12,7 @@ export default {
     videoUrl: {
       type: String,
       default() {
-        return "http://localhost/%E9%98%B4%E6%99%B4%E8%A1%A5%E4%B8%81.mp4";
+        return "http://10.62.82.120/%E9%98%B4%E6%99%B4%E8%A1%A5%E4%B8%81.mp4";
       },
     },
     // 预览图片

@@ -21,11 +21,10 @@ export default {
 <style lang="scss" scoped>
 .videoPlayer {
   width: 100%;
-
   display: block;
   position: absolute;
-  top: 0px;
-  bottom: 48px;
+  top: 0;
+  bottom: 46rem;
   .video {
     display: flex;
     width: 100%;

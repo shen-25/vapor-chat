@@ -38,7 +38,11 @@ export default {
   computed: {},
   methods: {
     back() {
-      this.$router.back();
+      if (this.$router.back.length == 0) {
+        this.$router.push("/");
+      } else {
+        this.$router.back();
+      }
     },
   },
 };
