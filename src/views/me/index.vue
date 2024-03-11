@@ -1,15 +1,21 @@
 <template>
   <div class="me">
-    <div ref="float" class="float">
-      <div class="left" @click="editUserBtn">
+    <div ref="float" class="float" :class="floatCls">
+      <div class="left" @click="editUserBtn" :style="floatStyle">
         <i class="icon-edit"></i>
         <span>编辑资料</span>
       </div>
+      <transition name="fade">
+        <div class="center" v-if="floatFixed">
+          <p class="name f15 mt1r mb1r">我是阿斯蒂芬</p>
+        </div>
+      </transition>
+
       <div class="right">
-        <div class="item">
+        <div class="item" :style="floatStyle">
           <i class="icon-nav"></i>
         </div>
-        <div class="item">
+        <div class="item" :style="floatStyle">
           <i class="icon-nav"></i>
         </div>
         <div class="item">
@@ -20,7 +26,12 @@
         </div>
       </div>
     </div>
-    <Scroll class="me-content">
+    <Scroll
+      class="me-content"
+      :probe-type="3"
+      @scroll="onScroll"
+      ref="scrollRef"
+    >
       <div>
         <div class="desc">
           <header>
@@ -110,17 +121,17 @@
             </div>
           </div>
         </div>
-        <Indicator
-          name="videoList"
-          tabStyleWidth="25%"
-          :tabTexts="['作品', '私密', '喜欢', '收藏']"
-          v-model:active-index="contentIndex"
-        >
-        </Indicator>
-        <Preview />
+        <Indicator v-model:currentTabIndex="currentTabIndex"> </Indicator>
+        <Preview :postList="postList" />
       </div>
     </Scroll>
   </div>
+  <Indicator
+    :class="tabCls"
+    v-if="showFixedIndicator"
+    v-model:currentTabIndex="currentTabIndex"
+  >
+  </Indicator>
   <Footer /><router-view></router-view>
 </template>
 
@@ -128,7 +139,7 @@
 import Indicator from "@/components/slide/Indicator";
 import Scroll from "@/components/base/scroll/Scroll";
 import Preview from "@/components/preview/index.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import Footer from "@/components/footer/Footer.vue";
 
@@ -143,26 +154,93 @@ export default {
   setup() {
     const router = useRouter();
     const userinfo = ref(null);
+    const scrollRef = ref(null);
+    const scrollY = ref(0);
+
+    const DISTANCE = 100;
+
+    const floatFixed = ref(false);
+
+    const currentTabIndex = ref(0);
+
+    const postList = ref([]);
+
     const slideRowListStyle = computed(() => {
       return {
         height: "calc(100vh - 146rem)",
       };
     });
+
+    const floatCls = computed(() => {
+      return floatFixed.value ? "fixed" : "";
+    });
+
+    const floatStyle = computed(() => {
+      return floatFixed.value ? "opacity: 0;" : "";
+    });
+
+    const showFixedIndicator = ref(false);
+
+    const tabCls = computed(() => {
+      return showFixedIndicator.value ? "tabCls" : "";
+    });
+
+    watch(currentTabIndex, () => {
+      console.log(currentTabIndex.value);
+      if (currentTabIndex.value == 1) {
+        postList.value = [1, 2, 3];
+      } else if (currentTabIndex.value == 2) {
+        postList.value = [1];
+      } else {
+        postList.value = [1, 2, 3, 4, 5, 6, 10, 8, 9];
+      }
+    });
+
     function editUserBtn() {
       router.push({
         path: `/me/edit-userinfo`,
       });
     }
+    function onScroll(pos) {
+      scrollY.value = -pos.y;
+      if (scrollY.value >= DISTANCE) {
+        floatFixed.value = true;
+      } else {
+        floatFixed.value = false;
+      }
+      if (scrollY.value >= 297) {
+        showFixedIndicator.value = true;
+      } else {
+        showFixedIndicator.value = false;
+      }
+    }
     return {
       slideRowListStyle,
       editUserBtn,
       userinfo,
+      scrollRef,
+      onScroll,
+      floatCls,
+      floatStyle,
+      floatFixed,
+      tabCls,
+      showFixedIndicator,
+      currentTabIndex,
+      postList,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.tabCls {
+  position: fixed;
+  top: 45rem;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  z-index: 9000;
+}
 .float {
   position: fixed;
   box-sizing: border-box;
@@ -180,15 +258,14 @@ export default {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: #000;
   }
 
-  $main-bg: rgb(21, 23, 36);
   &.fixed {
-    background: $main-bg;
-
+    background: #fff;
+    color: #000;
     .item {
-      background: $main-bg !important;
+      // background: #fff !important;
     }
   }
 
@@ -376,10 +453,9 @@ export default {
 
     .other {
       display: flex;
-
+      justify-content: space-between;
       .item {
         width: 20vw;
-        margin-right: 25rem;
         display: flex;
         flex-direction: column;
         align-items: center;

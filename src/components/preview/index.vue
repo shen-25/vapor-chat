@@ -1,20 +1,22 @@
 <template>
   <div class="container">
-    <div class="preview-item" v-for="item in list" :key="item">
+    <div class="preview-item" v-for="item in postList" :key="item">
       <span class="img-container">
         <img class="picture" src="http://localhost/6.jpg" />
       </span>
-      <div class="note-body">
+      <div class="footer">
         <div class="text">
-          看见达拉斯方法大嫂而非去啊打算反馈杰地方撒拉德是否看了就打算附件两份但是风口浪尖大师傅
+          <span
+            >看见达拉斯方法大嫂而非去啊打算反馈杰地方撒拉德是否看了就打算附件两份但是风口浪尖大师傅</span
+          >
         </div>
-        <div class="footer">
-          <a href="http://localhost/6.jpg" class="title"><span></span></a>
+        <div class="wrapper">
           <div class="author-wrapper">
-            <div class="like-wrapper">
-              <span class="like"></span>
-              <span class="count"></span>
-            </div>
+            <img src="http://localhost/6.jpg" alt="" class="author-avatar" />
+            <span class="name">体制内打工人</span>
+          </div>
+          <div class="like-wrapper">
+            <Like />
           </div>
         </div>
       </div>
@@ -23,11 +25,16 @@
 </template>
 
 <script>
+import Like from "@/components/like/index.vue";
 export default {
+  name: "preView",
+  components: {
+    Like,
+  },
   props: {
-    list: {
+    postList: {
       type: Array,
-      default: [1, 2, 3, 4, 6, , 8],
+      default: [],
     },
   },
 };
@@ -42,7 +49,7 @@ export default {
   justify-content: center;
   .preview-item {
     position: relative;
-    height: calc(68vw * 1.2);
+    height: calc(72vw * 1.2);
     margin-bottom: 2rem;
     border-radius: 4rem;
     overflow: hidden;
@@ -64,26 +71,59 @@ export default {
       }
     }
 
-    .note-body {
+    .footer {
       display: flex;
-      align-content: center;
+      flex-direction: column;
       padding: 10rem 8rem 4rem 8rem;
-
       .text {
+        margin-bottom: 8rem;
         font-size: 15rem;
-        line-height: 15rem;
-
         /* 内容过长显示两行，多余为省略号 */
         text-overflow: ellipsis; /*设置隐藏部分为省略号*/
         overflow: hidden; /*设置隐藏*/
-        display: -webkit-box;
         -webkit-line-clamp: 2; /*设置显示行数，此处为2行，可设置其他数字*/
         -webkit-box-orient: vertical;
-
         color: #333;
-        font-weight: 600;
+        word-break: break-all;
+        display: -webkit-box;
+        line-height: 140%;
       }
-      .footer {
+      .wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 20rem;
+        font-size: 12rem;
+        transition: color 1s;
+        color: rgba(51, 51, 51, 0.8);
+        .author-wrapper {
+          display: flex;
+          align-items: center;
+          color: inherit;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-right: 12rem;
+          .author-avatar {
+            margin-right: 6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+          }
+          .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+      .like-wrapper {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
       }
     }
   }

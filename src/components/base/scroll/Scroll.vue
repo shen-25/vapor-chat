@@ -19,6 +19,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    scrollY: {
+      type: Boolean,
+      default: true,
+    },
     probeType: {
       type: Number,
       default: 0,

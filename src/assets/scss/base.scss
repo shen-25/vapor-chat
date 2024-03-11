@@ -52,6 +52,15 @@ html {
   }
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 .mr1r {
   margin-right: 10rem;
 }
@@ -60,4 +69,16 @@ html {
 }
 .f16 {
   font-size: 16rem;
+}
+.f15 {
+  font-size: 15rem;
+}
+.f14 {
+  font-size: 14rem;
+}
+.mt1r {
+  margin-top: 10rem !important;
+}
+.mb1r {
+  margin-bottom: 10rem !important;
 }

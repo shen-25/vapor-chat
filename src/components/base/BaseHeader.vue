@@ -38,7 +38,7 @@ export default {
   computed: {},
   methods: {
     back() {
-      if (this.$router.back.length == 0) {
+      if (window.history.length <= 1) {
         this.$router.push("/");
       } else {
         this.$router.back();
