@@ -30,6 +30,14 @@ const routes = [
       import(/* webpackChunkName: "Singer" */ "@/views/message/index.vue"),
   },
   {
+    path: "/message/chat",
+    name: "Chat",
+    component: () =>
+      import(
+        /* webpackChunkName: "ChooseSchool" */ "@/views/message/chat/index.vue"
+      ),
+  },
+  {
     path: "/me",
     name: "Me",
     component: () =>

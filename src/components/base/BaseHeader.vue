@@ -51,9 +51,10 @@ export default {
 <style scoped lang="scss">
 #BaseHeader {
   width: 100%;
+  background: #fff;
 
   &.fixed {
-    z-index: 2;
+    z-index: 1000;
     top: 0;
     position: fixed;
   }

@@ -239,7 +239,7 @@ export default {
   left: 0;
   width: 100%;
   background: #fff;
-  z-index: 9000;
+  z-index: 900;
 }
 .float {
   position: fixed;

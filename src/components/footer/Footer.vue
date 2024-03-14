@@ -21,7 +21,7 @@ export default {
   position: fixed;
   bottom: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 100;
   border-top: solid 0.8rem #e5e4e4;
   background: #fff;
   .channel-list {
