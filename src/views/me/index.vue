@@ -142,7 +142,7 @@ import Preview from "@/components/preview/index.vue";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import Footer from "@/components/footer/Footer.vue";
-
+import { inject } from "vue";
 export default {
   name: "Me",
   components: {
@@ -164,6 +164,10 @@ export default {
     const currentTabIndex = ref(0);
 
     const postList = ref([]);
+    const imSdk = inject("$imSdk");
+    imSdk.initIm("", 10000, "111", "suein", function (sdk) {
+      console.log(sdk);
+    });
 
     const slideRowListStyle = computed(() => {
       return {

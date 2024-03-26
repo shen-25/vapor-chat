@@ -10,7 +10,10 @@ import "vant/lib/index.css";
 
 import { Popup, Button, DatePicker, Field, Area } from "vant";
 
-createApp(App)
+import { useImClient } from "./im/core/use-im-client";
+
+const app = createApp(App);
+app
   .use(store)
   .use(router)
   .use(Button)
@@ -19,3 +22,4 @@ createApp(App)
   .use(Popup)
   .use(Area)
   .mount("#app");
+app.provide("$imSdk", useImClient);

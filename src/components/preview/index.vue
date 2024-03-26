@@ -7,8 +7,8 @@
       <div class="footer">
         <div class="text">
           <span
-            >看见达拉斯方法大嫂而非去啊打算反馈杰地方撒拉德是否看了就打算附件两份但是风口浪尖大师傅</span
-          >
+            >风雨送春归，飞雪迎春到。已是悬崖百丈冰，犹有花枝俏。俏也不争春，只把春来报。待到山花烂漫时，她在丛中笑。
+          </span>
         </div>
         <div class="wrapper">
           <div class="author-wrapper">

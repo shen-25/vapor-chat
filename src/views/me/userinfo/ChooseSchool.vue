@@ -26,7 +26,7 @@
       <div class="item">
         <div class="left">入学时间</div>
         <div class="right">
-          <span>2016</span>
+          <span>2020</span>
           <i class="icon-right-back"></i>
         </div>
       </div>
