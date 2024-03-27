@@ -97,7 +97,6 @@ export default {
         imSdk.sendP2PMessage(
           imSdk.createP2PTextMessage(friendId, messageText.value)
         );
-        messageText.value = "";
         const msg = {
           type: MESSAGE_TYPE.TEXT,
           data: messageText.value,
@@ -107,6 +106,7 @@ export default {
             avatar: "../../../assets/img/icon/head-image.jpg",
           },
         };
+        messageText.value = "";
         messageList.value.push(msg);
       }
     }

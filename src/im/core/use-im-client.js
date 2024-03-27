@@ -77,7 +77,7 @@ export default class UseImClient {
     if (ObjUtil.isEmpty(this.url)) {
       // websocket地址为空,走登录逻辑
       // TODO 这里写死先
-      let ip = "10.62.82.120";
+      let ip = "127.0.0.1";
       let port = 19000;
       this.url = "ws://" + ip + ":" + port + "/ws";
     }
@@ -89,9 +89,9 @@ export default class UseImClient {
       this
     );
     if (success) {
-      console.log(
-        "注册到websocket成功, appId: " + appId + ",userId : " + userId
-      );
+      // console.log(
+      //   "注册到websocket成功, appId: " + appId + ",userId : " + userId
+      // );
       if (!firstMonitorSocket) {
         firstMonitorSocket = true;
       }
@@ -107,7 +107,7 @@ export default class UseImClient {
       };
 
       connect.onclose = (e) => {
-        console.log("websocket关闭");
+        // console.log("websocket关闭");
         if (this.state == StateEnum.CLOSING) {
           this.onclose("logout");
           return;
@@ -128,7 +128,7 @@ export default class UseImClient {
         let bodyLen = byteBuffer[1]; //解析bodylen
         let unpack = bytebuf.vstring(null, bodyLen).unpack(); //解析出字符串
         let msgBody = unpack[2];
-        console.log("sdk收到服务端数据: " + msgBody);
+        // console.log("sdk收到服务端数据: " + msgBody);
         if (command === MessageCommand.MSG_P2P) {
           //单聊消息收发
           if (typeof useImClient.listeners.onP2PMessage === "function") {

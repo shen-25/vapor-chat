@@ -18,21 +18,22 @@ export default {
     return {
       tabs: [
         {
-          name: "首页",
-          path: "/",
+          name: "消息",
+          path: "/message",
+        },
+        {
+          name: "推荐",
+          path: "/recommend",
+        },
+        {
+          name: "发布",
+          path: "/publishWork",
         },
         {
           name: "朋友",
           path: "/friend",
         },
-        {
-          name: "发布",
-          path: "/upload-content",
-        },
-        {
-          name: "消息",
-          path: "/message",
-        },
+
         {
           name: "我的",
           path: "/me",

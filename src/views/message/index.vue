@@ -80,7 +80,8 @@
         </div>
       </Scroll>
     </div>
-    <Footer /><router-view />
+    <Footer />
+    <router-view />
   </div>
 </template>
 

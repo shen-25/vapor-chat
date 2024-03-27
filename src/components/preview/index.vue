@@ -1,9 +1,11 @@
 <template>
-  <div class="container">
+  <div class="preview-container">
     <div class="preview-item" v-for="item in postList" :key="item">
-      <span class="img-container">
+      <div class="img-container">
         <img class="picture" src="http://localhost/6.jpg" />
-      </span>
+        <i class="icon-isVideo-tip"></i>
+      </div>
+
       <div class="footer">
         <div class="text">
           <span
@@ -41,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.preview-container {
   display: grid;
   grid-template-columns: 48.6vw 48.6vw;
   margin: 4rem calc(0.2vw);
@@ -53,6 +55,7 @@ export default {
     margin-bottom: 2rem;
     border-radius: 4rem;
     overflow: hidden;
+    background-color: #fff;
     .img-container {
       display: block;
       padding-top: 33rem;
@@ -61,6 +64,18 @@ export default {
       border-radius: 8rem 8rem 0 0;
       overflow: hidden;
       padding-top: 133%;
+      .icon-isVideo-tip {
+        font-size: 16rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: 14rem;
+        top: 14rem;
+        width: 20rem;
+        height: 20rem;
+        z-index: 10000;
+      }
       .picture {
         position: absolute;
         top: 0;
@@ -68,6 +83,9 @@ export default {
         width: 100%;
         height: 100%;
         border-radius: inherit;
+        img {
+          border: none;
+        }
       }
     }
 
@@ -109,7 +127,6 @@ export default {
             width: 20px;
             height: 20px;
             border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
             flex-shrink: 0;
           }
           .name {

@@ -22,14 +22,30 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "friend" */ "@/views/friend/index.vue"),
   },
+
   {
-    path: "/upload-content",
-    name: "UploadContent",
+    path: "/recommend",
+    name: "Recommend",
+    component: () =>
+      import(/* webpackChunkName: "recommend" */ "@/views/recommend/index.vue"),
+  },
+  {
+    path: "/publishWork",
+    name: "publishWork",
     component: () =>
       import(
-        /* webpackChunkName: "upload-content" */ "@/views/upload-content/index.vue"
+        /* webpackChunkName: "publishWork" */ "@/views/publish-work/index.vue"
       ),
   },
+  {
+    path: "/publishWork/publish",
+    name: "publish",
+    component: () =>
+      import(
+        /* webpackChunkName: "publish" */ "@/views/publish-work/publish.vue"
+      ),
+  },
+
   {
     path: "/message",
     name: "Message",
