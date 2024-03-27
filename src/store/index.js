@@ -1,14 +1,13 @@
-import { createStore } from 'vuex'
+import { createPinia } from "pinia";
+/**
+ * 创建store
+ */
+export const store = createPinia();
 
-export default createStore({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
-})
+/**
+ * 设置store
+ * @param app
+ */
+export function setupStore(app) {
+  app.use(store);
+}

@@ -15,9 +15,9 @@
             ><div class="friend-container">
               <div
                 class="friend-item"
-                v-for="(item, index) in friends"
+                v-for="(item, index) in friendshipList"
                 :key="index"
-                @click="onChat()"
+                @click="onChat(item.toId)"
               >
                 <div class="avatar" :class="index % 2 === 0 ? 'on-line' : ''">
                   <img
@@ -27,16 +27,6 @@
                   />
                 </div>
                 <span>完美世界</span>
-              </div>
-              <div class="friend-item">
-                <div class="avatar">
-                  <img
-                    src="../../assets/images/icon/message/setting.png"
-                    alt=""
-                    class="friend-avatar"
-                  />
-                </div>
-                <span>状态设置</span>
               </div>
             </div></Scroll
           >
@@ -58,8 +48,6 @@
                 <div class="right"><i class="icon-right-back"></i></div>
               </div>
             </div>
-
-            <!--      系统通知-->
             <div class="notice">
               <div class="avatar">
                 <img
@@ -92,8 +80,7 @@
         </div>
       </Scroll>
     </div>
-    <Footer />
-    <router-view />
+    <Footer /><router-view />
   </div>
 </template>
 
@@ -103,6 +90,9 @@ import BaseHeader from "@/components/base/BaseHeader.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { getAllFriendshipApi } from "@/api/friendship.js";
+import { useUserStore } from "@/store/user";
+import { APP_ID } from "@/config/setting";
 export default {
   components: {
     Footer,
@@ -110,13 +100,32 @@ export default {
     Scroll,
   },
   setup() {
-    const friends = ref([0, 1, 2, 3, 4, 4, 5, 6, 3, 34, 4]);
+    const userStore = useUserStore();
+
+    const friendshipList = ref([]);
     const router = useRouter();
 
-    function onChat(id) {
-      router.push({ path: "/message/chat" });
+    function onChat(friendId) {
+      router.push({ path: `/message/${friendId}` });
     }
-    return { friends, onChat };
+    async function getAllFriendShip() {
+      const friendParam = {
+        fromId: userStore.getUserId(),
+        appId: APP_ID,
+      };
+      try {
+        const { code, msg, data } = await getAllFriendshipApi(friendParam);
+        if (code !== 0) {
+          return;
+        }
+        // 修改页码和数据总条数、表格赋值
+        friendshipList.value = data;
+      } catch (e) {
+      } finally {
+      }
+    }
+    getAllFriendShip();
+    return { friendshipList, onChat };
   },
 };
 </script>

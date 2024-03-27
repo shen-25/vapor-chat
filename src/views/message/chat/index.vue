@@ -1,6 +1,6 @@
 <template>
   <div class="chat-container">
-    <div class="chat-header">
+    <div class="header">
       <div class="left">
         <Back @click="back()" />
         <div class="badge">12</div>
@@ -10,11 +10,11 @@
         <i class="icon-shengluehao"></i>
       </div>
     </div>
-    <div class="chat-content-wrapper">
+    <div class="main">
       <Scroll class="chat-content">
         <div>
           <ChatMessage
-            v-for="item in messages"
+            v-for="item in messageList"
             :message="item"
             :key="item"
           ></ChatMessage>
@@ -23,9 +23,11 @@
     </div>
     <div class="footer">
       <div class="search-input">
-        <input class="input-inner" :placeholder="placeholder" />
+        <input class="input-inner" v-model="messageText" />
       </div>
-      <div class="notice"><div class="text">发送</div></div>
+      <div class="notice">
+        <div class="text" @click="onSendMessage(MESSAGE_TYPE.TEXT)">发送</div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,29 +38,98 @@ import Back from "@/components/base/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import ChatMessage from "./ChatMessage.vue";
-import { ref } from "vue";
+import { ref, inject, onMounted } from "vue";
+
+import { MESSAGE_TYPE } from "./use-chat.js";
+
+import { useUserStore } from "@/store/user";
 export default {
   name: "chat",
+
   components: {
     BaseHeader,
     Back,
     ChatMessage,
     Scroll,
   },
-  setup() {
-    let MESSAGE_TYPE = {
-      TEXT: 0,
-      TIME: 1,
-      VIDEO: 2,
-      DOUYIN_VIDEO: 9,
-      AUDIO: 3,
-      IMAGE: 6,
-      VIDEO_CALL: 4,
-      AUDIO_CALL: 5,
-      MEME: 7, //表情包
-      RED_PACKET: 8, //红包
-    };
+  setup(props, { emit }) {
     const router = useRouter();
+
+    const userStore = useUserStore();
+
+    const imSdk = inject("$imSdk");
+
+    const messageText = ref("");
+
+    imSdk.listeners.onP2PMessage = async (pack) => {
+      await onListenMessage(JSON.parse(pack));
+    };
+
+    const messageList = ref([
+      {
+        type: MESSAGE_TYPE.TEXT,
+        data: "我是曾深",
+        createTime: "2021-01-02 21:21",
+        user: {
+          userId: "1",
+          avatar: "../../../assets/img/icon/head-image.jpg",
+        },
+      },
+      {
+        type: MESSAGE_TYPE.TEXT,
+        data: "我是心里",
+        time: "2021-01-02 21:21",
+        user: {
+          userId: "11",
+          avatar: "../../../assets/img/icon/head-image.jpg",
+        },
+      },
+    ]);
+
+    async function onSendMessage(msgType) {
+      if (messageText.value == "" || messageText.value == undefined) {
+        return;
+      }
+      // 发送文本消息
+      if (msgType === MESSAGE_TYPE.TEXT) {
+        const friendId = router.currentRoute.value.params.id;
+        // 构造数据格式
+        imSdk.sendP2PMessage(
+          imSdk.createP2PTextMessage(friendId, messageText.value)
+        );
+        messageText.value = "";
+        const msg = {
+          type: MESSAGE_TYPE.TEXT,
+          data: messageText.value,
+          time: new Date(),
+          user: {
+            userId: userStore.getUserId(),
+            avatar: "../../../assets/img/icon/head-image.jpg",
+          },
+        };
+        messageList.value.push(msg);
+      }
+    }
+
+    async function onListenMessage(msgPack) {
+      console.log("单聊监听接收聊天信息", msgPack);
+      const data = msgPack.data;
+      const messageBody = JSON.parse(data.messageBody);
+      // 文本消息
+      if (messageBody.type == MESSAGE_TYPE.TEXT) {
+        const msg = {
+          data: messageBody.content,
+          type: MESSAGE_TYPE.TEXT,
+          createTime: data.messageTime,
+          user: {
+            userId: data.fromId,
+            avatar: "../../../assets/img/icon/head-image.jpg",
+          },
+        };
+        messageList.value.push(msg);
+      }
+    }
+
     function back() {
       if (window.history.length <= 1) {
         router.push("/");
@@ -66,118 +137,20 @@ export default {
         router.back();
       }
     }
-    const messages = ref([
-      {
-        type: MESSAGE_TYPE.TIME,
-        data: "",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "1",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "1",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "1",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "1",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了我也找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "93864497380",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-      {
-        type: MESSAGE_TYPE.TEXT,
-        data: "我找不到了",
-        time: "2021-01-02 21:21",
-        user: {
-          id: "1",
-          avatar: "../../../assets/img/icon/head-image.jpg",
-        },
-      },
-    ]);
-    return {
-      back,
-      messages,
-    };
+    return { MESSAGE_TYPE, back, messageList, messageText, onSendMessage };
   },
 };
 </script>
 <style lang="scss" scoped>
 .chat-container {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   background: #fff;
-  .chat-header {
+  .header {
     z-index: 200;
     height: 50rem;
     padding: 0 10rem;
@@ -212,7 +185,7 @@ export default {
       }
     }
   }
-  .chat-content-wrapper {
+  .main {
     position: fixed;
     width: 100%;
     top: 51rem;

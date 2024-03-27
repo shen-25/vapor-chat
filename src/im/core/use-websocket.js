@@ -41,13 +41,13 @@ export async function registerToWebSocket(webSocketUrl, loginReq, useImClient) {
     };
     connect.onerror = (error) => {
       clearTimeout(timer);
-      log.error(error);
+      console.error(error);
       resolve({ success: false, error: error, connect: connect });
     };
 
     connect.onmessage = (evt) => {
       if (typeof evt.data === "string") {
-        log.info("接受到消息: '" + evt.data + "'");
+        console.log("接受到消息: '" + evt.data + "'");
         return;
       }
       clearTimeout(timer);

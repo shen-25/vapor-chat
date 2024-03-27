@@ -8,18 +8,20 @@ import "@/assets/scss/index.scss";
 
 import "vant/lib/index.css";
 
-import { Popup, Button, DatePicker, Field, Area } from "vant";
+import { Popup, Button, DatePicker, Field, Area, Form, CellGroup } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
 
 const app = createApp(App);
-app
-  .use(store)
-  .use(router)
-  .use(Button)
-  .use(DatePicker)
-  .use(Field)
-  .use(Popup)
-  .use(Area)
-  .mount("#app");
+
+import { setupStore } from "./store/index";
+// 配置store
+setupStore(app);
+
 app.provide("$imSdk", useImClient);
+
+app.use(store).use(router);
+app.use(Form);
+app.use(Field);
+app.use(CellGroup);
+app.use(Button).use(DatePicker).use(Popup).use(Area).mount("#app");

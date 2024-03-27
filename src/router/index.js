@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import EditUserInfoItem from "@/views/me/userinfo/EditUserInfoItem";
+import MessageChat from "@/views/message/chat/index.vue";
 
 const routes = [
   {
@@ -10,32 +11,36 @@ const routes = [
       import(/* webpackChunkName: "HomeView" */ "@/views/HomeView.vue"),
   },
   {
+    path: "/login",
+    name: "Login",
+    component: () =>
+      import(/* webpackChunkName: "Login" */ "@/views/common/login/index.vue"),
+  },
+  {
     path: "/friend",
     name: "Friend",
     component: () =>
-      import(/* webpackChunkName: "Singer" */ "@/views/friend/index.vue"),
+      import(/* webpackChunkName: "friend" */ "@/views/friend/index.vue"),
   },
   {
     path: "/upload-content",
     name: "UploadContent",
     component: () =>
       import(
-        /* webpackChunkName: "Singer" */ "@/views/upload-content/index.vue"
+        /* webpackChunkName: "upload-content" */ "@/views/upload-content/index.vue"
       ),
   },
   {
     path: "/message",
     name: "Message",
     component: () =>
-      import(/* webpackChunkName: "Singer" */ "@/views/message/index.vue"),
-  },
-  {
-    path: "/message/chat",
-    name: "Chat",
-    component: () =>
-      import(
-        /* webpackChunkName: "ChooseSchool" */ "@/views/message/chat/index.vue"
-      ),
+      import(/* webpackChunkName: "message" */ "@/views/message/index.vue"),
+    children: [
+      {
+        path: ":id",
+        component: MessageChat,
+      },
+    ],
   },
   {
     path: "/me",

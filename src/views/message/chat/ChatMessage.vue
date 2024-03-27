@@ -29,28 +29,10 @@
   </div>
 </template>
 <script>
-let CALL_STATE = {
-  REJECT: 0,
-  RESOLVE: 1,
-  NONE: 2,
-};
+import { MESSAGE_TYPE, CALL_STATE } from "./use-chat.js";
+import { useUserStore } from "@/store/user";
+import { mapStores } from "pinia";
 
-let RED_PACKET_MODE = {
-  SINGLE: 1,
-  MULTIPLE: 2,
-};
-let MESSAGE_TYPE = {
-  TEXT: 0,
-  TIME: 1,
-  VIDEO: 2,
-  DOUYIN_VIDEO: 9,
-  AUDIO: 3,
-  IMAGE: 6,
-  VIDEO_CALL: 4,
-  AUDIO_CALL: 5,
-  MEME: 7, //表情包
-  RED_PACKET: 8, //红包
-};
 export default {
   name: "ChatMessage",
   props: {
@@ -65,13 +47,13 @@ export default {
     return {
       MESSAGE_TYPE,
       CALL_STATE,
-      RED_PACKET_MODE,
     };
   },
   computed: {
     isMe() {
-      return Math.random() * 10 > 5;
+      return this.userStore.getUserId() === this.message.user.userId;
     },
+    ...mapStores(useUserStore),
   },
   created() {},
   methods: {},

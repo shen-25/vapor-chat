@@ -4,9 +4,8 @@ import { registerToWebSocket } from "./use-websocket";
 import ByteBuffer from "../utils/codec/byte-buffer";
 import { sleep, getLen } from "./main-constant";
 import { MessagePack } from "../model/pack/message-pack";
-import WebToolkit from "../utils/web-tool-kit";
 import { heartbeatInterval, StateEnum } from "./main-constant";
-import { SystemCommand } from "../commom/command";
+import { SystemCommand, MessageCommand } from "../commom/command";
 
 let firstMonitorSocket = false; // 第一次监听socket
 
@@ -68,18 +67,17 @@ export default class UseImClient {
   isInit() {
     this.state === StateEnum.CONNECTED;
   }
-  async initIm(httpUrl, appId, userId, userSign, callback) {
+  async initIm(httpUrl, appId, userId, imei, userSign, callback) {
     this.httpUrl = httpUrl;
     this.appId = appId;
-    this.imei = WebToolkit.getDeviceInfo().system;
+    this.imei = imei;
     this.imeiLength = getLen(this.imei);
     this.userId = userId;
     this.userSign = userSign;
-    debugger;
     if (ObjUtil.isEmpty(this.url)) {
       // websocket地址为空,走登录逻辑
       // TODO 这里写死先
-      let ip = "127.0.0.1";
+      let ip = "10.62.82.120";
       let port = 19000;
       this.url = "ws://" + ip + ":" + port + "/ws";
     }
@@ -99,7 +97,7 @@ export default class UseImClient {
       }
 
       connect.onerror = (error) => {
-        log.info("websocket error: ", error);
+        console.error("websocket error: ", error);
         // 加入socket 连接事件
         if (typeof useImClient.listeners.onSocketErrorEvent === "function") {
           useImClient.listeners.onSocketErrorEvent(error);
@@ -109,7 +107,7 @@ export default class UseImClient {
       };
 
       connect.onclose = (e) => {
-        log.info("websocket关闭");
+        console.log("websocket关闭");
         if (this.state == StateEnum.CLOSING) {
           this.onclose("logout");
           return;
@@ -190,9 +188,9 @@ export default class UseImClient {
           }
           return;
         }
-        console.log(error);
+        console.error(error);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     // 关闭连接
@@ -224,7 +222,7 @@ export default class UseImClient {
       return;
     }
     this.state = StateEnum.CLOSED;
-    console.log("websocket连接关闭, 关闭原因：" + reason);
+    console.info("websocket连接关闭, 关闭原因：" + reason);
     this.connect = undefined;
     this.userId = "";
 
