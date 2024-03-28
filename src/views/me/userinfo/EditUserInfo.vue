@@ -112,7 +112,7 @@
 <script>
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-import BaseHeader from "@/components/base/BaseHeader.vue";
+import BaseHeader from "@/components/base/back/BaseHeader.vue";
 import ChooseBirthday from "./ChooseBirthday.vue";
 import { areaList } from "@vant/area-data";
 

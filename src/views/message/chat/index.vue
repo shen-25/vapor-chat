@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import BaseHeader from "@/components/base/BaseHeader.vue";
-import Back from "@/components/base/Back.vue";
+import BaseHeader from "@/components/base/back/BaseHeader.vue";
+import Back from "@/components/base/back/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import ChatMessage from "./ChatMessage.vue";

@@ -10,13 +10,16 @@ export default function useSlider(wrapperRef) {
   onMounted(() => {
     //把dom传给
     const sliderVal = (slider.value = new BScroll(wrapperRef.value, {
-      click: true,
+      click: false,
       scrollX: true,
       scrollY: false,
       momentum: false,
       bounce: false,
       probeType: 2,
-      slide: true,
+      slide: {
+        loop: false,
+        autoplay: false,
+      },
     }));
     sliderVal.on("slideWillChange", (page) => {
       currentPageIndex.value = page.pageX;

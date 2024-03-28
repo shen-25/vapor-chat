@@ -1,7 +1,7 @@
 <template>
   <div class="publish-container">
     <div class="header">
-      <div class="left">
+      <div class="left" @click="onBack">
         <i class="icon-back"></i>
       </div>
       <div class="right">
@@ -19,7 +19,7 @@
         <div class="text">
           <van-field
             rows="4"
-            v-model="postModel.content"
+            v-model="postModel.text"
             type="textarea"
             placeholder="添加正文"
           />
@@ -27,7 +27,7 @@
         <div class="extraneous-info">
           <div class="location">
             <van-field
-              v-model="postModel.location"
+              v-model="locationResult"
               is-link
               readonly
               name="picker"
@@ -35,13 +35,6 @@
               placeholder="点击选择地点"
               @click="showLocationPicker = true"
             ></van-field>
-            <van-popup position="bottom" v-model:show="showLocationPicker">
-              <van-picker
-                :columns="locationColumns"
-                @confirm="onLocationConfirm"
-                @cancel="showLocationPicker = false"
-              />
-            </van-popup>
           </div>
           <div class="visible">
             <van-field
@@ -53,13 +46,6 @@
               placeholder="点击选择"
               @click="showVisiblePicker = true"
             ></van-field>
-            <van-popup position="bottom" v-model:show="showVisiblePicker">
-              <van-picker
-                :columns="visibleColumns"
-                @confirm="onVisibleConfirm"
-                @cancel="showVisiblePicker = false"
-              />
-            </van-popup>
           </div>
         </div>
       </div>
@@ -69,42 +55,60 @@
         <i class="icon-draft"></i>
         <div class="text">存草稿</div>
       </div>
-      <div class="post">
+      <div class="post" @click="onSubmit">
         <div class="text">发布笔记</div>
       </div>
     </div>
+    <van-popup position="bottom" v-model:show="showLocationPicker">
+      <van-picker
+        :columns="locationColumns"
+        @confirm="onLocationConfirm"
+        @cancel="showLocationPicker = false"
+      />
+    </van-popup>
+    <van-popup position="bottom" v-model:show="showVisiblePicker">
+      <van-picker
+        :columns="visibleColumns"
+        @confirm="onVisibleConfirm"
+        @cancel="showVisiblePicker = false"
+      />
+    </van-popup>
   </div>
 </template>
 
 <script>
 import PreviewImage from "@/components/base/pre-image/PreviewImage.vue";
 import Scroll from "@/components/base/scroll/Scroll";
+import { useUserStore } from "@/store/user";
 import { ref } from "vue";
+import { workPublishApi } from "@/api/work/publish-work";
+import { useRouter } from "vue-router";
 export default {
   name: "publish",
   components: { Scroll, PreviewImage },
   setup() {
+    const router = useRouter();
     const postModel = ref({
       title: "",
-      content: "",
-      location: "",
-      visible: 1,
+      text: "",
+      location: "东莞",
+      privateFlag: 1,
+      type: 1,
     });
-
+    const locationResult = ref("东莞");
     const visibleResult = ref("公开可见");
     const showLocationPicker = ref(false);
     const showVisiblePicker = ref(false);
-    const uploadFileList = ref([
-      "https://img2.baidu.com/it/u=4031236485,1141790304&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1711731600&t=65e61d251d894bb803cad5325dec188e",
-      "https://img2.baidu.com/it/u=4031236485,1141790304&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1711731600&t=65e61d251d894bb803cad5325dec188e",
-      "https://img2.baidu.com/it/u=4031236485,1141790304&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1711731600&t=65e61d251d894bb803cad5325dec188e",
-    ]);
+    const uploadFileList = ref([]);
+
+    const userStore = useUserStore();
     const locationColumns = [
-      { text: "杭州", value: "Hangzhou" },
-      { text: "宁波", value: "Ningbo" },
-      { text: "温州", value: "Wenzhou" },
-      { text: "绍兴", value: "Shaoxing" },
-      { text: "湖州", value: "Huzhou" },
+      { text: "杭州", value: "hanzhou" },
+      { text: "东莞", value: "dongguan" },
+      { text: "宁波", value: "ningbo" },
+      { text: "温州", value: "wenzhou" },
+      { text: "绍兴", value: "shaoxing" },
+      { text: "湖州", value: "huzhou" },
     ];
     const visibleColumns = [
       { text: "公开可见", value: "1" },
@@ -113,17 +117,51 @@ export default {
 
     const onLocationConfirm = ({ selectedOptions }) => {
       postModel.value.location = selectedOptions[0]?.text;
+      locationResult.value = selectedOptions[0]?.text;
       showLocationPicker.value = false;
     };
     const onVisibleConfirm = ({ selectedOptions }) => {
-      postModel.value.visible = selectedOptions[0]?.value;
+      postModel.value.privateFlag = selectedOptions[0]?.value;
       visibleResult.value = selectedOptions[0]?.text;
       showVisiblePicker.value = false;
     };
 
+    async function onSubmit() {
+      postModel.value.userId = userStore.getUserId();
+      const imageWorkReqList = [];
+      uploadFileList.value.forEach((element) => {
+        const image = {
+          imageUrl: element,
+        };
+        imageWorkReqList.push(image);
+      });
+      const { code, msg, data } = await workPublishApi({
+        ...postModel.value,
+        imageWorkReqList,
+      });
+      if (code !== 0) {
+        console.log("发布作品失败");
+      } else {
+        postModel.value = {
+          title: "",
+          text: "",
+          location: "东莞",
+          privateFlag: 1,
+          type: 1,
+        };
+        uploadFileList.value = [];
+        (locationResult.value = "宁波"), (visibleResult.value = "公开可见");
+      }
+    }
+
+    function onBack() {
+      router.push("/recommend");
+    }
+
     return {
       postModel,
       visibleResult,
+      locationResult,
       locationColumns,
       visibleColumns,
       onLocationConfirm,
@@ -131,6 +169,8 @@ export default {
       showLocationPicker,
       showVisiblePicker,
       uploadFileList,
+      onSubmit,
+      onBack,
     };
   },
 };
@@ -191,7 +231,7 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 0;
     height: 66rem;
     display: flex;
     flex-direction: row;

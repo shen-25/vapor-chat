@@ -10,6 +10,9 @@ export const useUserStore = defineStore({
   },
   getters: {
     getUserId(state) {
+      if (localStorage.getItem("userId")) {
+        return () => localStorage.getItem("userId");
+      }
       return () => state.userInfo.userId;
     },
   },

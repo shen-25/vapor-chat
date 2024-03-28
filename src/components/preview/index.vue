@@ -1,21 +1,18 @@
 <template>
   <div class="preview-container">
     <div class="preview-item" v-for="item in postList" :key="item">
-      <div class="img-container">
-        <img class="picture" src="http://localhost/6.jpg" />
-        <i class="icon-isVideo-tip"></i>
+      <div class="img-container" @click="onItemClick(item)">
+        <img class="picture" :src="item.coverUrl" />
+        <i class="icon-isVideo-tip" v-if="item.type === 0"></i>
       </div>
-
       <div class="footer">
-        <div class="text">
-          <span
-            >风雨送春归，飞雪迎春到。已是悬崖百丈冰，犹有花枝俏。俏也不争春，只把春来报。待到山花烂漫时，她在丛中笑。
-          </span>
+        <div class="text" @click="onItemClick(item)">
+          <span v-html="item.title"></span>
         </div>
         <div class="wrapper">
           <div class="author-wrapper">
             <img src="http://localhost/6.jpg" alt="" class="author-avatar" />
-            <span class="name">体制内打工人</span>
+            <span class="name">{{ item.nickname }}</span>
           </div>
           <div class="like-wrapper">
             <Like />
@@ -38,6 +35,15 @@ export default {
       type: Array,
       default: [],
     },
+  },
+  emits: ["select"],
+  setup(props, { emit }) {
+    function onItemClick(work) {
+      emit("select", work);
+    }
+    return {
+      onItemClick,
+    };
   },
 };
 </script>
@@ -74,7 +80,7 @@ export default {
         top: 14rem;
         width: 20rem;
         height: 20rem;
-        z-index: 10000;
+        z-index: 150;
       }
       .picture {
         position: absolute;

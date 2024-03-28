@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import EditUserInfoItem from "@/views/me/userinfo/EditUserInfoItem";
 import MessageChat from "@/views/message/chat/index.vue";
+import ExploreWork from "@/views/explore-work/index.vue";
 
 const routes = [
   {
@@ -28,6 +29,12 @@ const routes = [
     name: "Recommend",
     component: () =>
       import(/* webpackChunkName: "recommend" */ "@/views/recommend/index.vue"),
+    children: [
+      {
+        path: ":id",
+        component: ExploreWork,
+      },
+    ],
   },
   {
     path: "/publishWork",
@@ -45,7 +52,6 @@ const routes = [
         /* webpackChunkName: "publish" */ "@/views/publish-work/publish.vue"
       ),
   },
-
   {
     path: "/message",
     name: "Message",

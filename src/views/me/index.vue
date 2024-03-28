@@ -122,7 +122,7 @@
           </div>
         </div>
         <Indicator v-model:currentTabIndex="currentTabIndex"> </Indicator>
-        <Preview :postList="postList" />
+        <Preview :postList="postList" @select="selectWork" />
       </div>
     </Scroll>
   </div>

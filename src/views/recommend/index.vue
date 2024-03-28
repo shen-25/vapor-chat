@@ -4,11 +4,12 @@
       <Header></Header>
     </div>
     <Scroll class="content">
-      <div>
-        <Preview :postList="postList" />
+      <div class="scroll">
+        <Preview :postList="workPostList" @select="selectWork" />
       </div>
     </Scroll>
     <div class="footer"><Footer /></div>
+    <router-view />
   </div>
 </template>
 
@@ -17,13 +18,49 @@ import Header from "./header/Header";
 import Footer from "@/components/footer/Footer.vue";
 import Preview from "@/components/preview/index.vue";
 import Scroll from "@/components/base/scroll/Scroll";
-
+import { useRouter } from "vue-router";
+import { getWorkListApi } from "@/api/work/publish-work";
 import { ref } from "vue";
 export default {
   components: { Header, Footer, Preview, Scroll },
   setup() {
-    const postList = ref([1, 2, 2, 12, 12, 3, 132, 132, 312, 231, 1, 1, 1]);
-    return { postList };
+    const router = useRouter();
+
+    const workPostList = ref([]);
+
+    const page = ref(1);
+    const pageSize = ref(10);
+
+    const keyword = ref("");
+
+    async function getWorkPostList(param) {
+      debugger;
+      if (!param) {
+        param = {
+          keyword: keyword.value,
+          page: page.value,
+          pageSize: pageSize.value,
+        };
+      }
+      try {
+        const { code, msg, data } = await getWorkListApi(param);
+        if (code !== 0) {
+          return;
+        }
+        // 修改页码和数据总条数、表格赋值
+        workPostList.value = data.list || [];
+      } catch (e) {
+      } finally {
+      }
+    }
+
+    function selectWork(work) {
+      router.push(`/recommend/${work.postId}`);
+    }
+
+    getWorkPostList();
+
+    return { workPostList, selectWork };
   },
 };
 </script>
@@ -43,6 +80,9 @@ export default {
   .content {
     height: 100%;
     overflow: hidden;
+  }
+  .scroll {
+    padding-bottom: 120rem;
   }
 }
 </style>

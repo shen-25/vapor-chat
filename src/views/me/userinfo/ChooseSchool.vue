@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import BaseHeader from "@/components/base/BaseHeader.vue";
+import BaseHeader from "@/components/base/back/BaseHeader.vue";
 export default {
   name: "ChooseSchool",
   components: {

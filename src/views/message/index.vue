@@ -87,7 +87,7 @@
 
 <script>
 import Footer from "@/components/footer/Footer.vue";
-import BaseHeader from "@/components/base/BaseHeader.vue";
+import BaseHeader from "@/components/base/back/BaseHeader.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
