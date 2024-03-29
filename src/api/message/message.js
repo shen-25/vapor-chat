@@ -2,6 +2,7 @@ import { request } from "@/utils/request";
 
 const MessageApi = {
   getP2PMessage: "/v1/message/get/p2pMessage",
+  getGroupMessage: "/v1/group/get/groupMessage",
 };
 
 /**
@@ -14,9 +15,17 @@ export function loginApi(param) {
   });
 }
 /**
- * 获取验证码
+ * 获取单聊消息
  * @returns
  */
 export function getP2PMessageApi(param) {
   return request.get(MessageApi.getP2PMessage, { params: param });
+}
+
+/**
+ * 获取群聊消息
+ * @returns
+ */
+export function getGroupMessageApi(param) {
+  return request.get(MessageApi.getGroupMessage, { params: param });
 }

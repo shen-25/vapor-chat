@@ -5,6 +5,7 @@ export class MessagePack {
   messageId;
   fromId;
   toId;
+  avatar;
   messageRandom;
   messageTime;
   messageBody;
@@ -13,7 +14,7 @@ export class MessagePack {
     this.messageId = ObjUtil.uuid();
     this.appId = appId;
     this.messageRandom = this.RangeInteger(0, 10000);
-    this.messageTime = Date.parse(new Date().toString());
+    this.messageTime = new Date();
   }
 
   RangeInteger(min, max) {
@@ -33,6 +34,20 @@ export class MessagePack {
     this.fromId = fromId;
     this.toId = toId;
     let body = { type: type, content: obj };
+    this.messageBody = ObjUtil.json(body);
+  }
+
+  /**
+   * 构建群聊消息
+   * @param {} fromId
+   * @param {*} toId
+   * @param {*} text
+   */
+  buildGroupTextMessagePack(fromId, toId, text, avatar) {
+    this.fromId = fromId;
+    this.groupId = toId;
+    this.avatar = avatar;
+    let body = { type: 1, content: text };
     this.messageBody = ObjUtil.json(body);
   }
 }

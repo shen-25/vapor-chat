@@ -10,6 +10,9 @@
     <template v-else>
       <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
       <div class="chat-wrapper">
+        <div class="remark" v-if="!isMe">
+          {{ message.user.remark }}
+        </div>
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
           {{ message.data }}
         </div>
@@ -110,6 +113,15 @@ export default {
     font-size: 12rem;
   }
   .chat-wrapper {
+    .remark {
+      font-size: 11rem;
+      color: #b4adad;
+      max-width: 60vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 8rem;
+    }
     .chat-text {
       max-width: 60vw;
       padding: 10rem;

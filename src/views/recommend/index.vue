@@ -34,7 +34,6 @@ export default {
     const keyword = ref("");
 
     async function getWorkPostList(param) {
-      debugger;
       if (!param) {
         param = {
           keyword: keyword.value,

@@ -14,9 +14,10 @@
       <Scroll class="chat-content" :bounce="true">
         <div>
           <ChatMessage
-            v-for="item in messageList"
+            v-for="(item, index) in messageList"
             :message="item"
             :key="item"
+            :class="getChatCls(index)"
           ></ChatMessage>
         </div>
       </Scroll>
@@ -117,18 +118,10 @@ export default {
           createTime: data.messageTime,
           user: {
             userId: data.fromId,
-            avatar: getUSerAvatar(data.fromId),
+            avatar,
           },
         };
         messageList.value.push(msg);
-      }
-    }
-
-    function getUSerAvatar(fromId) {
-      for (let i = 0; i < messageList.value.length; i++) {
-        if (fromId == messageList.value[i].user.userId) {
-          return messageList.value[i].user.avatar;
-        }
       }
     }
     function back() {
@@ -139,8 +132,25 @@ export default {
       }
     }
 
+    function getChatCls(index) {
+      if (index == 0) {
+        return "pad-top-20rem";
+      } else if (index == messageList.value.length - 1) {
+        return "pad-bottom-20rem";
+      } else {
+        return "";
+      }
+    }
+
     getP2PMessageData();
-    return { MESSAGE_TYPE, back, messageList, messageText, onSendMessage };
+    return {
+      MESSAGE_TYPE,
+      back,
+      messageList,
+      messageText,
+      onSendMessage,
+      getChatCls,
+    };
   },
 };
 </script>
@@ -193,7 +203,6 @@ export default {
     width: 100%;
     top: 51rem;
     bottom: 51rem;
-    padding: 12rem 0 12rem 0;
     overflow: scroll;
     .chat-content {
       height: 100%;

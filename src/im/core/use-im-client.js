@@ -5,7 +5,7 @@ import ByteBuffer from "../utils/codec/byte-buffer";
 import { sleep, getLen } from "./main-constant";
 import { MessagePack } from "../model/pack/message-pack";
 import { heartbeatInterval, StateEnum } from "./main-constant";
-import { SystemCommand, MessageCommand } from "../commom/command";
+import { SystemCommand, MessageCommand, GroupCommand } from "../commom/command";
 
 let firstMonitorSocket = false; // 第一次监听socket
 
@@ -42,6 +42,9 @@ export default class UseImClient {
     },
     onP2PMessage: function (e) {
       // 收到单聊消息事件处理逻辑
+    },
+    onGroupMessage: function (e) {
+      // 收到群聊消息事件处理逻辑
     },
     onTestMessage: function (e) {
       // 收到消息事件处理逻辑（测试用）
@@ -89,9 +92,9 @@ export default class UseImClient {
       this
     );
     if (success) {
-      // console.log(
-      //   "注册到websocket成功, appId: " + appId + ",userId : " + userId
-      // );
+      console.log(
+        "注册到websocket成功, appId: " + appId + ",userId : " + userId
+      );
       if (!firstMonitorSocket) {
         firstMonitorSocket = true;
       }
@@ -134,9 +137,9 @@ export default class UseImClient {
           if (typeof useImClient.listeners.onP2PMessage === "function") {
             useImClient.listeners.onP2PMessage(msgBody);
           }
-        } else {
-          if (typeof useImClient.listeners.onTestMessage === "function") {
-            useImClient.listeners.onTestMessage(msgBody);
+        } else if (command === GroupCommand.MSG_GROUP) {
+          if (typeof useImClient.listeners.onGroupMessage === "function") {
+            useImClient.listeners.onGroupMessage(msgBody);
           }
         }
       };
@@ -267,6 +270,27 @@ export default class UseImClient {
     let p2pPack = useImClient.buildMessagePack(MessageCommand.MSG_P2P, pack);
     if (this.connect) {
       this.connect.send(p2pPack.pack(false));
+    }
+  }
+
+  /**
+   * 构建群聊消息对象
+   * @param {*} to
+   * @param {*} text
+   * @returns
+   */
+  createGroupTextMessage(to, text, fromAvatar) {
+    let messagePack = new MessagePack(this.appId);
+    messagePack.buildGroupTextMessagePack(this.userId, to, text, fromAvatar);
+    return messagePack;
+  }
+  /**
+   * 发送群聊消息
+   */
+  sendGroupMessage(pack) {
+    let groupPack = useImClient.buildMessagePack(GroupCommand.MSG_GROUP, pack);
+    if (this.connect) {
+      this.connect.send(groupPack.pack(false));
     }
   }
 

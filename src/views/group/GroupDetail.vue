@@ -13,9 +13,10 @@
       <Scroll class="chat-content" :bounce="true">
         <div>
           <ChatMessage
-            v-for="item in messageList"
+            v-for="(item, index) in messageGroupList"
             :message="item"
             :key="item"
+            :class="getChatCls(index)"
           ></ChatMessage>
         </div>
       </Scroll>
@@ -25,7 +26,9 @@
         <input class="input-inner" v-model="messageText" />
       </div>
       <div class="notice">
-        <div class="text" @click="onSendMessage(MESSAGE_TYPE.TEXT)">发送</div>
+        <div class="text" @click="onSendGroupMessage(MESSAGE_TYPE.TEXT)">
+          发送
+        </div>
       </div>
     </div>
   </div>
@@ -40,7 +43,7 @@ import ChatMessage from "@/views/message/chat/ChatMessage.vue";
 import { ref, inject, onMounted } from "vue";
 
 import { MESSAGE_TYPE } from "@/views/message/chat/use-chat.js";
-import { getP2PMessageApi } from "@/api/message/message";
+import { getGroupMessageApi } from "@/api/message/message";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
 export default {
@@ -61,31 +64,31 @@ export default {
 
     const messageText = ref("");
 
-    const messageList = ref([]);
+    const messageGroupList = ref([]);
 
-    imSdk.listeners.onP2PMessage = async (pack) => {
-      await onListenMessage(JSON.parse(pack));
+    imSdk.listeners.onGroupMessage = async (pack) => {
+      await onListenGroupMessage(JSON.parse(pack));
     };
 
-    async function getP2PMessageData() {
+    async function getGroupMessageData() {
       const param = {
         appId: APP_ID,
         fromId: userStore.getUserId(),
-        toId: router.currentRoute.value.params.id,
+        groupId: router.currentRoute.value.params.id,
       };
-      const { msg, code, data } = await getP2PMessageApi(param);
+      const { msg, code, data } = await getGroupMessageApi(param);
       if (code === 0) {
-        messageList.value = data;
+        messageGroupList.value = data;
       }
     }
 
-    async function onSendMessage(msgType) {
+    async function onSendGroupMessage(msgType) {
       if (messageText.value == "" || messageText.value == undefined) {
         return;
       }
       // 发送文本消息
       if (msgType === MESSAGE_TYPE.TEXT) {
-        const friendId = router.currentRoute.value.params.id;
+        const groupId = router.currentRoute.value.params.id;
         const msg = {
           type: MESSAGE_TYPE.TEXT,
           data: messageText.value,
@@ -93,19 +96,25 @@ export default {
           user: {
             userId: userStore.getUserId(),
             avatar: userStore.getAvatar(),
+            remark: userStore.getRemark(),
           },
         };
-        messageList.value.push(msg);
+        messageGroupList.value.push(msg);
+
         // 构造数据格式
-        imSdk.sendP2PMessage(
-          imSdk.createP2PTextMessage(friendId, messageText.value)
+        imSdk.sendGroupMessage(
+          imSdk.createGroupTextMessage(
+            groupId,
+            messageText.value,
+            userStore.getAvatar()
+          )
         );
         messageText.value = "";
       }
     }
 
-    async function onListenMessage(msgPack) {
-      console.log("单聊监听接收聊天信息", msgPack);
+    async function onListenGroupMessage(msgPack) {
+      console.log("群聊听接收聊天信息", msgPack);
       const data = msgPack.data;
       const messageBody = JSON.parse(data.messageBody);
       // 文本消息
@@ -116,20 +125,14 @@ export default {
           createTime: data.messageTime,
           user: {
             userId: data.fromId,
-            avatar: getUSerAvatar(data.fromId),
+            avatar: data.avatar,
+            remark: data.remark,
           },
         };
-        messageList.value.push(msg);
+        messageGroupList.value.push(msg);
       }
     }
 
-    function getUSerAvatar(fromId) {
-      for (let i = 0; i < messageList.value.length; i++) {
-        if (fromId == messageList.value[i].user.userId) {
-          return messageList.value[i].user.avatar;
-        }
-      }
-    }
     function back() {
       if (window.history.length <= 1) {
         router.push("/");
@@ -137,9 +140,27 @@ export default {
         router.back();
       }
     }
+    function getChatCls(index) {
+      if (index == 0) {
+        return "pad-top-20rem";
+      } else if (index == messageGroupList.value.length - 1) {
+        return "pad-bottom-20rem";
+      } else {
+        return "";
+      }
+    }
 
-    getP2PMessageData();
-    return { MESSAGE_TYPE, back, messageList, messageText, onSendMessage };
+    // 初始化setup调用
+    getGroupMessageData();
+
+    return {
+      MESSAGE_TYPE,
+      back,
+      messageGroupList,
+      messageText,
+      onSendGroupMessage,
+      getChatCls,
+    };
   },
 };
 </script>
@@ -153,6 +174,7 @@ export default {
   right: 0;
   background: #fff;
   z-index: 600;
+
   .header {
     z-index: 200;
     height: 50rem;
@@ -182,7 +204,6 @@ export default {
     width: 100%;
     top: 51rem;
     bottom: 51rem;
-    padding-top: 20rem;
     overflow: scroll;
     .chat-content {
       height: 100%;

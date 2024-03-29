@@ -10,16 +10,22 @@ export const useUserStore = defineStore({
   },
   getters: {
     getUserId(state) {
-      if (localStorage.getItem("userId")) {
-        return () => localStorage.getItem("userId");
+      if (localStorage.getItem("userInfo")) {
+        return () => JSON.parse(localStorage.getItem("userInfo")).userId;
       }
       return () => state.userInfo.userId;
     },
     getAvatar(state) {
-      if (localStorage.getItem("avatar")) {
-        return () => localStorage.getItem("avatar");
+      if (localStorage.getItem("userInfo")) {
+        return () => JSON.parse(localStorage.getItem("userInfo")).avatar;
       }
       return () => state.userInfo.avatarUrl;
+    },
+    getRemark(state) {
+      if (localStorage.getItem("nickname")) {
+        return () => JSON.parse(localStorage.getItem("userInfo")).nickname;
+      }
+      return () => state.userInfo.nickname;
     },
   },
   actions: {

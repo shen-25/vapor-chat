@@ -112,9 +112,7 @@ export default {
       addGroup(req);
     }
     async function addGroup(req) {
-      debugger;
       const { msg, data, code } = await addGroupApi(req);
-      debugger;
       if (code == 0) {
         router.push("/message");
         checkboxRefs.value = [];
