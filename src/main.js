@@ -18,6 +18,10 @@ import {
   CellGroup,
   Picker,
   Uploader,
+  Popover,
+  Checkbox,
+  CheckboxGroup,
+  Cell,
 } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
@@ -34,7 +38,10 @@ app.use(store).use(router);
 app.use(Form);
 app.use(Field);
 app.use(CellGroup);
+app.use(Cell);
 app.use(Picker);
 app.use(Uploader);
-
+app.use(Popover);
+app.use(Checkbox);
+app.use(CheckboxGroup);
 app.use(Button).use(DatePicker).use(Popup).use(Area).mount("#app");

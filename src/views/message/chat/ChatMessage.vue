@@ -5,26 +5,16 @@
     :style="message.type === MESSAGE_TYPE.TIME && 'margin-bottom: 0;'"
   >
     <div class="time" v-if="message.type === MESSAGE_TYPE.TIME">
-      {{ message.time }}
+      {{ message.messageTime }}
     </div>
     <template v-else>
-      <img
-        v-if="!isMe"
-        src="../../../assets/images/icon/avatar/3.png"
-        alt=""
-        class="avatar"
-      />
+      <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
       <div class="chat-wrapper">
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
           {{ message.data }}
         </div>
       </div>
-      <img
-        v-if="isMe"
-        src="../../../assets/images/icon/avatar/2.png"
-        alt=""
-        class="avatar"
-      />
+      <img v-if="isMe" :src="message.user.avatar" alt="" class="avatar" />
     </template>
   </div>
 </template>
@@ -74,8 +64,9 @@ export default {
     word-break: break-all;
     .avatar {
       margin-left: 10rem;
-      height: 36rem;
-      border-radius: 50%;
+      height: 38rem;
+      width: 38rem;
+      border-radius: 10rem;
     }
 
     .audio-icon {
@@ -95,8 +86,9 @@ export default {
 
     .avatar {
       margin-right: 10rem;
-      height: 36rem;
-      border-radius: 50%;
+      height: 38rem;
+      width: 38rem;
+      border-radius: 10rem;
     }
 
     .audio-icon {

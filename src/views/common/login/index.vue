@@ -58,6 +58,7 @@ export default {
         // 登录失败
       } else {
         localStorage.setItem("userId", data.userId);
+        localStorage.setItem("avatar", data.avatarUrl);
         userStore.setUserInfo(data);
         await imSdk.initIm(
           "",

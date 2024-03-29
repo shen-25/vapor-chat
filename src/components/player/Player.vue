@@ -12,7 +12,7 @@ export default {
     videoUrl: {
       type: String,
       default() {
-        return "http://zengshen.com/%E9%98%B4%E6%99%B4%E8%A1%A5%E4%B8%81.mp4";
+        return "http://zengshen.org:9000/minio-upload/2023-08-23/%E9%98%B4%E6%99%B4%E8%A1%A5%E4%B8%81.mp4";
       },
     },
     // 预览图片

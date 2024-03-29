@@ -1,14 +1,22 @@
 <template>
   <div>
+    <div class="header">
+      <div class="left"></div>
+      <div class="text">消息</div>
+      <div class="popover">
+        <van-popover
+          v-model:show="showPopover"
+          :actions="actions"
+          @select="onAddSelect"
+          placement="bottom-end"
+        >
+          <template #reference>
+            <i class="icon-add"></i>
+          </template>
+        </van-popover>
+      </div>
+    </div>
     <div class="message-container">
-      <BaseHeader class="base-header-bottom">
-        <template v-slot:center>
-          <span class="f16">消息</span>
-        </template>
-        <template v-slot:right>
-          <span class="f14" @click="createChatDialog = true">创建群聊</span>
-        </template>
-      </BaseHeader>
       <Scroll class="message-content">
         <div>
           <Scroll :scrollX="true" :scrollY="false" class="friend-wrapper"
@@ -20,13 +28,9 @@
                 @click="onChat(item.toId)"
               >
                 <div class="avatar" :class="index % 2 === 0 ? 'on-line' : ''">
-                  <img
-                    src="../../assets/images/icon/avatar/0.png"
-                    alt=""
-                    class="friend-avatar"
-                  />
+                  <img :src="item.avatar" alt="" class="friend-avatar" />
                 </div>
-                <span>完美世界</span>
+                <span>{{ item.remark }}</span>
               </div>
             </div></Scroll
           >
@@ -126,12 +130,45 @@ export default {
       }
     }
     getAllFriendShip();
-    return { friendshipList, onChat };
+
+    const showPopover = ref(false);
+
+    // 通过 actions 属性来定义菜单选项
+    const actions = [
+      { text: "发起群聊", icon: "chat-o" },
+      { text: "添加朋友", icon: "add-o" },
+    ];
+    function onAddSelect(action) {
+      if (action.text == "发起群聊") {
+        router.push("/group/add");
+      } else {
+      }
+    }
+
+    return { friendshipList, onChat, actions, onAddSelect, showPopover };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.header {
+  height: 48rem;
+  border-bottom: 0.4px solid #e7e4e4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0rem 20rem;
+  .popover {
+    .icon-add {
+      font-size: 24rem;
+    }
+  }
+  .text {
+    font-size: 16rem;
+  }
+  .left {
+  }
+}
 .message-container {
   position: fixed;
   background: #fff;
@@ -139,9 +176,6 @@ export default {
   top: 48rem;
   bottom: 45rem;
   z-index: 10;
-  .base-header-bottom {
-    border-bottom: 0.4px solid #e7e4e4;
-  }
   .message-content {
     height: 100%;
     overflow: hidden;

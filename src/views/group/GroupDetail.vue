@@ -1,11 +1,10 @@
 <template>
-  <div class="chat-container">
+  <div class="group">
     <div class="header">
       <div class="left">
         <Back @click="back()" />
-        <div class="badge"></div>
-        <div class="name">zzzz</div>
       </div>
+      <div class="middle">群聊</div>
       <div class="right">
         <i class="icon-shengluehao"></i>
       </div>
@@ -37,10 +36,10 @@ import BaseHeader from "@/components/base/back/BaseHeader.vue";
 import Back from "@/components/base/back/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
-import ChatMessage from "./ChatMessage.vue";
+import ChatMessage from "@/views/message/chat/ChatMessage.vue";
 import { ref, inject, onMounted } from "vue";
 
-import { MESSAGE_TYPE } from "./use-chat.js";
+import { MESSAGE_TYPE } from "@/views/message/chat/use-chat.js";
 import { getP2PMessageApi } from "@/api/message/message";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
@@ -144,15 +143,16 @@ export default {
   },
 };
 </script>
+
 <style lang="scss" scoped>
-.chat-container {
-  position: fixed;
-  z-index: 1000;
+.group {
+  position: absolute;
   top: 0;
-  left: 0;
   bottom: 0;
+  left: 0;
   right: 0;
   background: #fff;
+  z-index: 600;
   .header {
     z-index: 200;
     height: 50rem;
@@ -163,24 +163,13 @@ export default {
     border-bottom: 1px solid #ebebec;
     background-color: #fff;
     .left {
-      max-width: 60%;
       overflow: hidden;
       display: flex;
       align-items: center;
-      .badge {
-        margin: 0rem 10rem 0rem 10rem;
-        font-size: 12rem;
-        display: block;
-        padding: 3rem 3rem;
-        border-radius: 50%;
-        color: #575757;
-        background: #eee8e9;
-      }
-      .name {
-        font-size: 14rem;
-      }
     }
-
+    .middle {
+      font-size: 16rem;
+    }
     .right {
       display: flex;
       .icon-shengluehao {
@@ -193,13 +182,14 @@ export default {
     width: 100%;
     top: 51rem;
     bottom: 51rem;
-    padding: 12rem 0 12rem 0;
+    padding-top: 20rem;
     overflow: scroll;
     .chat-content {
       height: 100%;
       overflow: hidden;
     }
   }
+
   .footer {
     display: flex;
     justify-content: space-between;

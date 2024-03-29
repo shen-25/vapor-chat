@@ -15,6 +15,12 @@ export const useUserStore = defineStore({
       }
       return () => state.userInfo.userId;
     },
+    getAvatar(state) {
+      if (localStorage.getItem("avatar")) {
+        return () => localStorage.getItem("avatar");
+      }
+      return () => state.userInfo.avatarUrl;
+    },
   },
   actions: {
     async setUserInfo(userInfo) {

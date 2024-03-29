@@ -30,7 +30,7 @@ export default {
           path: "/publishWork",
         },
         {
-          name: "朋友",
+          name: "通讯录",
           path: "/friend",
         },
 

@@ -3,7 +3,8 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import EditUserInfoItem from "@/views/me/userinfo/EditUserInfoItem";
 import MessageChat from "@/views/message/chat/index.vue";
 import ExploreWork from "@/views/explore-work/index.vue";
-
+import FriendDetail from "@/views/friend/index-list/index.vue";
+import GroupDetail from "@/views/group/GroupDetail.vue";
 const routes = [
   {
     path: "/",
@@ -22,6 +23,12 @@ const routes = [
     name: "Friend",
     component: () =>
       import(/* webpackChunkName: "friend" */ "@/views/friend/index.vue"),
+    children: [
+      {
+        path: ":id",
+        component: FriendDetail,
+      },
+    ],
   },
 
   {
@@ -93,6 +100,24 @@ const routes = [
       import(
         /* webpackChunkName: "ChooseSchool" */ "@/views/me/userinfo/ChooseSchool.vue"
       ),
+  },
+  {
+    path: "/group/add",
+    name: "addGroup",
+    component: () =>
+      import(/* webpackChunkName: "HomeView" */ "@/views/group/AddGroup.vue"),
+  },
+  {
+    path: "/group/list",
+    name: "GroupList",
+    component: () =>
+      import(/* webpackChunkName: "HomeView" */ "@/views/group/GroupList.vue"),
+    children: [
+      {
+        path: ":id",
+        component: GroupDetail,
+      },
+    ],
   },
 ];
 
