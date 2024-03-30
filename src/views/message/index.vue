@@ -23,64 +23,46 @@
             ><div class="friend-container">
               <div
                 class="friend-item"
-                v-for="(item, index) in friendshipList"
+                v-for="(item, index) in conversationList"
                 :key="index"
-                @click="onChat(item.toId)"
+                @click="onChat(item.toId, item.type)"
               >
                 <div class="avatar" :class="index % 2 === 0 ? 'on-line' : ''">
                   <img :src="item.avatar" alt="" class="friend-avatar" />
                 </div>
-                <span>{{ item.remark }}</span>
+                <span>{{ item.name }}</span>
               </div>
             </div></Scroll
           >
           <div class="notice-wrapper">
-            <div class="notice">
+            <div
+              class="notice"
+              v-for="(item, index) in conversationList"
+              :key="index"
+              @click="onChat(item.toId, item.type)"
+            >
               <div class="avatar">
-                <img
-                  src="../../assets/images/icon/msg-icon1.png"
-                  class="head-image"
-                />
+                <img :src="item.avatar" alt="" class="head-image" />
               </div>
               <div class="content">
                 <div class="left">
                   <div class="name">
-                    <span>新朋友</span>
-                  </div>
-                  <div class="detail">xxx 关注了你</div>
-                </div>
-                <div class="right"><i class="icon-right-back"></i></div>
-              </div>
-            </div>
-            <div class="notice">
-              <div class="avatar">
-                <img
-                  src="../../assets/images/icon/msg-icon4.png"
-                  alt=""
-                  class="head-image"
-                />
-              </div>
-              <div class="content">
-                <div class="left">
-                  <div class="name">
-                    <span>系统通知</span>
-                    <span class="tag">官方</span>
+                    <span>{{ item.name }}</span>
                   </div>
                   <div class="detail">
                     <div class="title">
                       协议修订通知协议修订通知协议修订通知协议修订通知协议修订通知
                     </div>
-                    <div class="point"></div>
-                    08-31
                   </div>
                 </div>
                 <div class="right">
-                  <div class="not-read"></div>
+                  <div class="time">03-19</div>
+                  <div class="icon">3</div>
                 </div>
               </div>
             </div>
-            <div class="white-space">暂时没有更多了</div>
           </div>
+          <div class="white-space">暂时没有更多了</div>
         </div>
       </Scroll>
     </div>
@@ -95,9 +77,9 @@ import BaseHeader from "@/components/base/back/BaseHeader.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { getAllFriendshipApi } from "@/api/friendship.js";
 import { useUserStore } from "@/store/user";
-import { APP_ID } from "@/config/setting";
+import { APP_ID, ConversationTypeEnum } from "@/config/setting";
+import { getConversationApi } from "@/api/conversation/index";
 export default {
   components: {
     Footer,
@@ -106,30 +88,32 @@ export default {
   },
   setup() {
     const userStore = useUserStore();
-
-    const friendshipList = ref([]);
     const router = useRouter();
 
-    function onChat(friendId) {
-      router.push({ path: `/message/${friendId}` });
+    const conversationList = ref([]);
+
+    function onChat(toId, type) {
+      if (type == ConversationTypeEnum.p2p)
+        router.push({ path: `/message/${toId}` });
+      if (type == ConversationTypeEnum.group) {
+        router.push({ path: `/group/list/${toId}` });
+      }
     }
-    async function getAllFriendShip() {
-      const friendParam = {
-        fromId: userStore.getUserId(),
+    async function getConversation() {
+      const param = {
         appId: APP_ID,
+        fromId: userStore.getUserId(),
       };
       try {
-        const { code, msg, data } = await getAllFriendshipApi(friendParam);
+        const { code, msg, data } = await getConversationApi(param);
         if (code !== 0) {
           return;
         }
-        // 修改页码和数据总条数、表格赋值
-        friendshipList.value = data;
+        conversationList.value = data;
       } catch (e) {
       } finally {
       }
     }
-    getAllFriendShip();
 
     const showPopover = ref(false);
 
@@ -144,8 +128,9 @@ export default {
       } else {
       }
     }
+    getConversation();
 
-    return { friendshipList, onChat, actions, onAddSelect, showPopover };
+    return { conversationList, onChat, actions, onAddSelect, showPopover };
   },
 };
 </script>
@@ -199,12 +184,17 @@ export default {
         }
       }
     }
-
     .notice-wrapper {
-      margin-top: 10rem;
+      display: flex;
+      flex-direction: column;
+      margin-top: 14rem;
       .notice {
         display: flex;
         align-items: center;
+        height: 60rem;
+        padding-left: 10rem;
+        align-items: center;
+        margin-bottom: 10rem;
         &.top {
           background: #353a4f;
         }
@@ -212,12 +202,10 @@ export default {
           background: rgb(211, 203, 203);
         }
         .avatar {
-          position: relative;
+          padding-right: 8rem;
           .head-image {
-            margin-left: 20rem;
-            margin-right: 15rem;
-            width: 45rem;
-            height: 45rem;
+            width: 50rem;
+            height: 50rem;
             border-radius: 50%;
           }
         }
@@ -225,10 +213,12 @@ export default {
           flex: 1;
           display: flex;
           justify-content: space-between;
-          padding: 14rem 0 14rem 0;
           .left {
+            display: flex;
+            flex-direction: column;
             .name {
-              font-size: 14rem;
+              color: #000;
+              font-size: 16rem;
               display: flex;
               align-items: flex-start;
               .tag {
@@ -241,38 +231,35 @@ export default {
               }
             }
             .detail {
-              font-size: 12rem;
-              margin-top: 4rem;
+              font-size: 13rem;
+              padding-top: 10rem;
               display: flex;
               align-items: center;
-
+              color: rgba(51, 51, 51, 0.6);
               .title {
-                width: 194rem;
+                width: 60vw;
                 @include no-wrap();
-              }
-              .point {
-                display: inline-block;
-                margin-left: 8rem;
-                margin-right: 8rem;
-                border-radius: 50%;
-                width: 1.5px;
-                height: 1.5px;
               }
             }
           }
           .right {
-            margin-right: 20rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            .icon-right-back {
-              font-size: 20rem;
+            height: 40rem;
+            margin-right: 8rem;
+            .time {
+              font-size: 13rem;
+              padding-bottom: 6rem;
             }
-            .not-read {
-              margin-right: 10rem;
-              width: 7rem;
-              height: 7rem;
+            .icon {
+              height: 22rem;
+              width: 22rem;
+              line-height: 22rem;
               border-radius: 50%;
               background: red;
+              font-size: 14rem;
+              text-align: center;
             }
           }
         }

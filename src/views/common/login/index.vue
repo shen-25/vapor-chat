@@ -34,7 +34,7 @@ import { ref, inject } from "vue";
 import { loginApi } from "@/api/user.js";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
-
+import WebToolkit from "@/im/utils/web-tool-kit";
 export default {
   name: "login",
 
@@ -57,15 +57,18 @@ export default {
       if (code !== 0) {
         // 登录失败
       } else {
+        console.log(data);
         localStorage.setItem("userInfo", JSON.stringify(data));
         userStore.setUserInfo(data);
+        const imei = WebToolkit.getDeviceInfo().system;
         await imSdk.initIm(
           "",
           data.appId,
           data.userId,
-          data.imei,
+          imei,
           data.userSign,
           function (sdk) {
+            console.log(imei);
             router.push("/message");
           }
         );

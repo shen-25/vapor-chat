@@ -23,9 +23,10 @@ export class MessagePack {
     return value;
   }
 
-  buildTextMessagePack(fromId, toId, text) {
+  buildTextMessagePack(fromId, toId, text, avatar) {
     this.fromId = fromId;
     this.toId = toId;
+    this.avatar = avatar;
     let body = { type: 1, content: text };
     this.messageBody = ObjUtil.json(body);
   }
@@ -43,9 +44,9 @@ export class MessagePack {
    * @param {*} toId
    * @param {*} text
    */
-  buildGroupTextMessagePack(fromId, toId, text, avatar) {
+  buildGroupTextMessagePack(fromId, groupId, text, avatar) {
     this.fromId = fromId;
-    this.groupId = toId;
+    this.toId = groupId;
     this.avatar = avatar;
     let body = { type: 1, content: text };
     this.messageBody = ObjUtil.json(body);

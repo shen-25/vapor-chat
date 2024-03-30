@@ -74,9 +74,12 @@ export default {
     function onGroupDiv() {
       router.push("/group/list");
     }
+    function selectFriend(toId) {
+      router.push({ path: `/message/${toId}` });
+    }
     getAllFriendshipNamePinyin();
 
-    return { friendListAndPinyin, totalFriends, onGroupDiv };
+    return { friendListAndPinyin, totalFriends, onGroupDiv, selectFriend };
   },
 };
 </script>

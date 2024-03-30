@@ -4,7 +4,7 @@
       <div class="left">
         <Back @click="back()" />
         <div class="badge"></div>
-        <div class="name">zzzz</div>
+        <div class="name"></div>
       </div>
       <div class="right">
         <i class="icon-shengluehao"></i>
@@ -39,8 +39,8 @@ import Back from "@/components/base/back/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import ChatMessage from "./ChatMessage.vue";
-import { ref, inject, onMounted } from "vue";
-
+import { ref, inject, onMounted, computed } from "vue";
+import WebToolkit from "@/im/utils/web-tool-kit";
 import { MESSAGE_TYPE } from "./use-chat.js";
 import { getP2PMessageApi } from "@/api/message/message";
 import { useUserStore } from "@/store/user";
@@ -100,7 +100,11 @@ export default {
         messageList.value.push(msg);
         // 构造数据格式
         imSdk.sendP2PMessage(
-          imSdk.createP2PTextMessage(friendId, messageText.value)
+          imSdk.createP2PTextMessage(
+            friendId,
+            messageText.value,
+            userStore.getAvatar()
+          )
         );
         messageText.value = "";
       }
@@ -118,7 +122,7 @@ export default {
           createTime: data.messageTime,
           user: {
             userId: data.fromId,
-            avatar,
+            avatar: data.avatar,
           },
         };
         messageList.value.push(msg);

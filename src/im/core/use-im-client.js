@@ -6,7 +6,7 @@ import { sleep, getLen } from "./main-constant";
 import { MessagePack } from "../model/pack/message-pack";
 import { heartbeatInterval, StateEnum } from "./main-constant";
 import { SystemCommand, MessageCommand, GroupCommand } from "../commom/command";
-
+import WebToolkit from "../utils/web-tool-kit";
 let firstMonitorSocket = false; // 第一次监听socket
 
 export default class UseImClient {
@@ -70,6 +70,7 @@ export default class UseImClient {
   isInit() {
     this.state === StateEnum.CONNECTED;
   }
+
   async initIm(httpUrl, appId, userId, imei, userSign, callback) {
     this.httpUrl = httpUrl;
     this.appId = appId;
@@ -260,9 +261,9 @@ export default class UseImClient {
   }
 
   //构建单聊消息对象
-  createP2PTextMessage(to, text) {
+  createP2PTextMessage(to, text, fromAvatar) {
     let messagePack = new MessagePack(this.appId);
-    messagePack.buildTextMessagePack(this.userId, to, text);
+    messagePack.buildTextMessagePack(this.userId, to, text, fromAvatar);
     return messagePack;
   }
 
@@ -296,6 +297,10 @@ export default class UseImClient {
 
   getUserId() {
     return this.userId;
+  }
+
+  isConnected() {
+    return this.state === StateEnum.CONNECTED;
   }
 }
 

@@ -121,7 +121,11 @@
             </div>
           </div>
         </div>
-        <Indicator v-model:currentTabIndex="currentTabIndex"> </Indicator>
+        <Indicator
+          :tabTexts="tabTexts"
+          v-model:currentTabIndex="currentTabIndex"
+        >
+        </Indicator>
         <Preview :postList="postList" @select="selectWork" />
       </div>
     </Scroll>
@@ -129,6 +133,7 @@
   <Indicator
     :class="tabCls"
     v-if="showFixedIndicator"
+    :tabTexts="tabTexts"
     v-model:currentTabIndex="currentTabIndex"
   >
   </Indicator>
@@ -151,6 +156,20 @@ export default {
     Footer,
   },
   setup() {
+    const tabTexts = [
+      {
+        name: "作品",
+      },
+      {
+        name: "私密",
+      },
+      {
+        name: "喜欢",
+      },
+      {
+        name: "收藏",
+      },
+    ];
     const router = useRouter();
     const userinfo = ref(null);
     const scrollRef = ref(null);
@@ -226,6 +245,7 @@ export default {
       showFixedIndicator,
       currentTabIndex,
       postList,
+      tabTexts,
     };
   },
 };

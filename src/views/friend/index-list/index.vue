@@ -83,7 +83,7 @@ export default {
     } = useShortcut(props, groupRef);
 
     const onItemClick = (item) => {
-      emit("select", item);
+      emit("select", item.toId);
     };
     return {
       groupRef,

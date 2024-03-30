@@ -17,12 +17,12 @@ export const useUserStore = defineStore({
     },
     getAvatar(state) {
       if (localStorage.getItem("userInfo")) {
-        return () => JSON.parse(localStorage.getItem("userInfo")).avatar;
+        return () => JSON.parse(localStorage.getItem("userInfo")).avatarUrl;
       }
       return () => state.userInfo.avatarUrl;
     },
     getRemark(state) {
-      if (localStorage.getItem("nickname")) {
+      if (localStorage.getItem("userInfo")) {
         return () => JSON.parse(localStorage.getItem("userInfo")).nickname;
       }
       return () => state.userInfo.nickname;

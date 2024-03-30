@@ -1,7 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import store from "./store";
 
 // 引入全局的样式文件
 import "@/assets/scss/index.scss";
@@ -34,7 +33,7 @@ setupStore(app);
 
 app.provide("$imSdk", useImClient);
 
-app.use(store).use(router);
+app.use(router);
 app.use(Form);
 app.use(Field);
 app.use(CellGroup);

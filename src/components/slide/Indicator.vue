@@ -19,24 +19,13 @@ export default {
       type: Number,
       default: 0,
     },
+    tabTexts: {
+      type: Array,
+      default: [],
+    },
   },
   data() {
-    return {
-      tabTexts: [
-        {
-          name: "作品",
-        },
-        {
-          name: "私密",
-        },
-        {
-          name: "喜欢",
-        },
-        {
-          name: "收藏",
-        },
-      ],
-    };
+    return {};
   },
   emit: ["update:currentTabIndex"],
   methods: {

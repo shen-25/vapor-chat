@@ -1,5 +1,7 @@
 <template>
-  <div id="upload-content" v-if="show"></div>
+  <div id="upload-content" v-if="show">
+    <slot name="center"><div></div></slot>
+  </div>
 </template>
 <script>
 import fileUtil from "@/utils/fileUtil";

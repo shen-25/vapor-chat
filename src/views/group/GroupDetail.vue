@@ -1,11 +1,9 @@
 <template>
   <div class="group">
     <div class="header">
-      <div class="left">
-        <Back @click="back()" />
-      </div>
+      <div class="left" @click="goBack"><i class="icon-back"></i></div>
       <div class="middle">群聊</div>
-      <div class="right">
+      <div class="right" @click="onGroupSettingBtn">
         <i class="icon-shengluehao"></i>
       </div>
     </div>
@@ -149,7 +147,13 @@ export default {
         return "";
       }
     }
+    function onGroupSettingBtn() {
+      router.push(`/group/setting/${router.currentRoute.value.params.id}`);
+    }
 
+    function goBack() {
+      router.back();
+    }
     // 初始化setup调用
     getGroupMessageData();
 
@@ -160,6 +164,8 @@ export default {
       messageText,
       onSendGroupMessage,
       getChatCls,
+      onGroupSettingBtn,
+      goBack,
     };
   },
 };
@@ -174,7 +180,6 @@ export default {
   right: 0;
   background: #fff;
   z-index: 600;
-
   .header {
     z-index: 200;
     height: 50rem;
@@ -185,14 +190,17 @@ export default {
     border-bottom: 1px solid #ebebec;
     background-color: #fff;
     .left {
-      overflow: hidden;
+      padding: 10rem 10rem;
       display: flex;
-      align-items: center;
+      .icon-back {
+        font-size: 24rem;
+      }
     }
     .middle {
       font-size: 16rem;
     }
     .right {
+      padding: 10rem 10rem;
       display: flex;
       .icon-shengluehao {
         font-size: 26rem;

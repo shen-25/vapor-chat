@@ -1,4 +1,5 @@
 import { Base64 } from "./base64";
+import Fetch from "../commom/fetch";
 export default class WebToolkit {
   // 获取浏览器信息
   static getBrowserInfo() {
@@ -200,7 +201,6 @@ export default class WebToolkit {
     /*IFTRUE_UNIAPP*/
     // const deviceInfo = WebToolkit.getUniAppInfo();
     /*FITRUE_UNIAPP*/
-
     return deviceInfo;
   }
 

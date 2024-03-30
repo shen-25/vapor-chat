@@ -108,6 +108,14 @@ const routes = [
       import(/* webpackChunkName: "HomeView" */ "@/views/group/AddGroup.vue"),
   },
   {
+    path: "/group/setting/:id",
+    name: "GroupSetting",
+    component: () =>
+      import(
+        /* webpackChunkName: "HomeView" */ "@/views/group/GroupSetting.vue"
+      ),
+  },
+  {
     path: "/group/list",
     name: "GroupList",
     component: () =>

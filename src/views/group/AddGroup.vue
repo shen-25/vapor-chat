@@ -1,7 +1,7 @@
 <template>
   <div class="add-group-container">
     <div class="header">
-      <div class="left">
+      <div class="left" @click="goBack">
         <i class="icon-back"></i>
       </div>
       <div class="middle">发起群聊</div>
@@ -119,6 +119,9 @@ export default {
         checkedFriendRef.value = [];
       }
     }
+    function goBack() {
+      router.back();
+    }
 
     getAllFriendship();
     return {
@@ -127,6 +130,7 @@ export default {
       checkboxRefs,
       friendListRef,
       onAddGroupBtn,
+      goBack,
     };
   },
 };
@@ -166,6 +170,7 @@ export default {
     justify-content: space-between;
     margin: 0 16rem 4rem 16rem;
     .left {
+      padding: 10rem;
       font-size: 22rem;
     }
     .middle {
