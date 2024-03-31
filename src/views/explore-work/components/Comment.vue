@@ -4,24 +4,21 @@
       <div class="comment-item">
         <div class="comment-inner-container">
           <div class="avatar">
-            <a href=""
-              ><img
-                src="https://sns-avatar-qc.xhscdn.com/avatar/645c8eb5bef4b6b8c9efb0cb.jpg?imageView2/2/w/120/format/jpg|imageMogr2/strip"
-            /></a>
+            <a href=""><img :src="data.userInfo.avatar" /></a>
           </div>
           <div class="right">
             <div class="author-wrapper">
               <div class="author">
-                <a href="" class="name">这个博主好会玩</a>
+                <a href="" class="name">{{ data.userInfo.nickname }}</a>
                 <span class="tag">作者</span>
               </div>
             </div>
-            <div class="content">个人还是比较喜欢这款车的 只是客观评价一下</div>
+            <div class="content">{{ data.content }}</div>
             <div class="labels">
               <span class="top">置顶评论</span>
             </div>
             <div class="info">
-              <span>昨天 17:36</span>
+              <span>{{ data.createTime }}</span>
               <div class="introductions">
                 <div class="like">44</div>
                 <div class="reply">22</div>
@@ -30,50 +27,19 @@
           </div>
         </div>
       </div>
-      <div class="reply-container">
-        <div class="list-container">
-          <div class="parent-comment">
-            <div class="comment-item">
-              <div class="comment-inner-container">
-                <div class="avatar">
-                  <a href=""
-                    ><img
-                      src="https://sns-avatar-qc.xhscdn.com/avatar/645c8eb5bef4b6b8c9efb0cb.jpg?imageView2/2/w/120/format/jpg|imageMogr2/strip"
-                  /></a>
-                </div>
-                <div class="right">
-                  <div class="author-wrapper">
-                    <div class="author">
-                      <a href="" class="name">这个博主好会玩</a>
-                      <span class="tag">作者</span>
-                    </div>
-                  </div>
-                  <div class="content">
-                    个人还是比较喜欢这款车的 只是客观评价一下
-                  </div>
-                  <div class="labels">
-                    <span class="top">置顶评论</span>
-                  </div>
-                  <div class="info">
-                    <span>昨天 17:36</span>
-                    <div class="introductions">
-                      <div class="like">44</div>
-                      <div class="reply">22</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="reply-container"></div>
-          </div>
-        </div>
-      </div>
+      <div class="reply-container"></div>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    data: {
+      type: Object,
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

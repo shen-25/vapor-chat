@@ -25,7 +25,7 @@ export default {
         },
         {
           name: "发现",
-          path: "/singer",
+          path: "/recommend",
         },
         {
           name: "排行",

@@ -11,7 +11,7 @@
         </div>
         <div class="wrapper">
           <div class="author-wrapper">
-            <img src="http://localhost/6.jpg" alt="" class="author-avatar" />
+            <img :src="item.avatar" alt="" class="author-avatar" />
             <span class="name">{{ item.nickname }}</span>
           </div>
           <div class="like-wrapper">

@@ -1,7 +1,7 @@
 <template>
   <div class="explore-container">
     <Header :headerData="headerData"></Header>
-    <div class="scroll-wrapper">
+    <div class="scroll-wrapper" @click="hideCommentDiv">
       <Scroll class="explore-content">
         <div>
           <div class="slider-wrapper">
@@ -20,8 +20,12 @@
           </div>
           <div class="comment-content">
             <div class="total">共100条评论</div>
-            <div class="list-container">
-              <Comment /> <Comment /> <Comment /> <Comment />
+            <div
+              class="list-container"
+              v-for="item in commentList"
+              :key="item.commentId"
+            >
+              <Comment :data="item"></Comment>
             </div>
           </div>
         </div>
@@ -56,11 +60,7 @@
     </div>
     <div class="toolbar" v-show="showInputDiv">
       <div class="content-edit">
-        <p
-          contenteditable="true"
-          class="content-input"
-          id="content-textarea"
-        ></p>
+        <p contenteditable class="content-input" id="content-textarea"></p>
       </div>
       <div class="tip">
         <div class="icons">
@@ -79,20 +79,27 @@ import Slider from "@/components/base/slider/Slider.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import Header from "./Header.vue";
 import { getWorkPostDetailApi } from "@/api/work/publish-work";
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import Comment from "./components/Comment.vue";
-
+import { addCommentApi, getCommentListApi } from "@/api/comment/index";
+import { useUserStore } from "@/store/user";
 export default {
   name: "explore",
   components: { Header, Slider, Scroll, Comment },
   setup() {
     const router = useRouter();
+    const userStore = useUserStore();
     const sliders = ref([]);
     const workDetail = ref({});
     const headerData = ref({});
+    const commentList = ref([]);
     const showInputDiv = ref(false);
     const showLine = ref(false);
+
+    const inputFocus = ref(false);
+
+    const inputPRef = ref(null);
 
     async function getWorkPostDetail(postId) {
       const { msg, data, code } = await getWorkPostDetailApi({ postId });
@@ -106,16 +113,56 @@ export default {
         };
       }
     }
-    function toInput() {
-      showInputDiv.value = true;
+    async function getCommentList() {
+      const param = {
+        postId: router.currentRoute.value.params.id,
+        commentId: 0,
+        userId: userStore.getUserId(),
+        page: 1,
+        pageSize: 10,
+      };
+      const { msg, data, code } = await getCommentListApi(param);
+
+      if (code === 0) {
+        commentList.value = data;
+      }
     }
-    function onSendBtn() {
+
+    async function addComment(content, type, parentId, replyId) {
+      const param = {
+        userId: userStore.getUserId(),
+        postId: workDetail.value.postId,
+        content,
+        type,
+        parentId,
+        replyId,
+      };
+      const { msg, data, code } = await addCommentApi(param);
+      if (code == 0) {
+        showInputDiv.value = false;
+        if (type == 0) {
+          document.getElementById("content-textarea").innerText = "";
+          getCommentList();
+        }
+      }
+    }
+
+    async function toInput() {
+      showInputDiv.value = true;
+      inputFocus.value = true;
+    }
+    async function onSendBtn() {
       const p = document.getElementById("content-textarea");
-      console.log(p.innerText);
+      addComment(p.innerText, 0, null, null);
+    }
+
+    function hideCommentDiv() {
       showInputDiv.value = false;
     }
 
     getWorkPostDetail(router.currentRoute.value.params.id);
+
+    getCommentList();
 
     return {
       sliders,
@@ -125,6 +172,9 @@ export default {
       onSendBtn,
       toInput,
       showLine,
+      hideCommentDiv,
+      inputPRef,
+      commentList,
     };
   },
 };

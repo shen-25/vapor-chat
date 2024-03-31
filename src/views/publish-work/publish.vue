@@ -8,10 +8,32 @@
         <i class="icon-tip"></i>
       </div>
     </div>
+    <div class="header-two">
+      <div
+        class="tab"
+        :class="isUploadVideo ? 'active' : ''"
+        @click="toggleUploadType"
+      >
+        上传视频
+      </div>
+      <div
+        class="tab"
+        :class="isUploadVideo ? '' : 'active'"
+        @click="toggleUploadType"
+      >
+        上传图文
+      </div>
+    </div>
     <Scroll class="content">
       <div class="scroll-content">
-        <div class="imageOrVideo">
+        <div class="image" v-if="!isUploadVideo">
           <PreviewImage :uploadFileList="uploadFileList"></PreviewImage>
+        </div>
+        <div class="video" v-if="isUploadVideo">
+          <UploadVideo
+            :videoUrl="videoUrl"
+            @updateVideoUrl="updateVideoUrl2"
+          ></UploadVideo>
         </div>
         <div class="title">
           <van-field v-model="postModel.title" placeholder="输入标题" />
@@ -78,14 +100,16 @@
 
 <script>
 import PreviewImage from "@/components/base/pre-image/PreviewImage.vue";
+import UploadVideo from "./components/UploadVideo.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useUserStore } from "@/store/user";
 import { ref } from "vue";
 import { workPublishApi } from "@/api/work/publish-work";
+
 import { useRouter } from "vue-router";
 export default {
   name: "publish",
-  components: { Scroll, PreviewImage },
+  components: { Scroll, PreviewImage, UploadVideo },
   setup() {
     const router = useRouter();
     const postModel = ref({
@@ -93,13 +117,15 @@ export default {
       text: "",
       location: "东莞",
       privateFlag: 1,
-      type: 1,
     });
     const locationResult = ref("东莞");
     const visibleResult = ref("公开可见");
     const showLocationPicker = ref(false);
     const showVisiblePicker = ref(false);
     const uploadFileList = ref([]);
+
+    const isUploadVideo = ref(true);
+    const videoUrl = ref("");
 
     const userStore = useUserStore();
     const locationColumns = [
@@ -128,27 +154,33 @@ export default {
 
     async function onSubmit() {
       postModel.value.userId = userStore.getUserId();
-      const imageWorkReqList = [];
-      uploadFileList.value.forEach((element) => {
-        const image = {
-          imageUrl: element,
+      let type = 0;
+      let imageWorkReqList = [];
+      let videoWorkReq = null;
+      if (isUploadVideo.value) {
+        videoWorkReq = {
+          videoUrl: videoUrl.value,
         };
-        imageWorkReqList.push(image);
-      });
+      } else {
+        type = 1;
+        uploadFileList.value.forEach((element) => {
+          const image = {
+            imageUrl: element,
+          };
+          imageWorkReqList.push(image);
+        });
+      }
+      debugger;
       const { code, msg, data } = await workPublishApi({
         ...postModel.value,
         imageWorkReqList,
+        videoWorkReq,
+        type,
       });
       if (code !== 0) {
         console.log("发布作品失败");
       } else {
-        postModel.value = {
-          title: "",
-          text: "",
-          location: "东莞",
-          privateFlag: 1,
-          type: 1,
-        };
+        resetPostModel();
         uploadFileList.value = [];
         (locationResult.value = "宁波"), (visibleResult.value = "公开可见");
       }
@@ -158,6 +190,21 @@ export default {
       router.push("/recommend");
     }
 
+    function toggleUploadType() {
+      isUploadVideo.value = !isUploadVideo.value;
+    }
+    function resetPostModel() {
+      postModel.value = {
+        title: "",
+        text: "",
+        location: "东莞",
+        privateFlag: 1,
+      };
+      (videoUrl.value = null), (uploadFileList.value = []);
+    }
+    function updateVideoUrl2(fileUrl) {
+      videoUrl.value = fileUrl;
+    }
     return {
       postModel,
       visibleResult,
@@ -171,6 +218,10 @@ export default {
       uploadFileList,
       onSubmit,
       onBack,
+      isUploadVideo,
+      videoUrl,
+      toggleUploadType,
+      updateVideoUrl2,
     };
   },
 };
@@ -201,19 +252,40 @@ export default {
       }
     }
   }
+  .header-two {
+    line-height: 28rem;
+    font-size: 20rem;
+    font-weight: 900;
+    margin: 8rem 0rem 10rem 0rem;
+    display: flex;
+    font-size: 16rem;
+    .tab {
+      margin: 0 15rem;
+      position: relative;
+      cursor: pointer;
+    }
+    .active {
+      color: red;
+      border-bottom: 3px red solid;
+    }
+  }
   .content {
     position: fixed;
     width: 100%;
-    top: 53rem;
+    top: 108rem;
     bottom: 80rem;
     .scroll-content {
       display: flex;
       flex-direction: column;
       height: 100%;
       overflow: hidden;
-      .imageOrVideo {
+      .image {
         height: 110rem;
         overflow: hidden;
+        margin: 8rem 8rem;
+      }
+      .video {
+        height: 160rem;
         margin: 8rem 8rem;
       }
       .title {
@@ -231,11 +303,12 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 0;
     height: 66rem;
     display: flex;
     flex-direction: row;
+    background: #fff;
     margin: 0 16rem;
+    z-index: -1;
     .draft {
       width: 20%;
       display: flex;

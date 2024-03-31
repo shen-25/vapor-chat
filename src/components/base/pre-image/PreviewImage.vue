@@ -13,10 +13,11 @@
       </div>
     </Scroll>
     <div class="upload-tip mar-left-8">
-      <FileUploader
-        @completeOneFile="getUploadFile"
-        class="file-uploader"
-      ></FileUploader>
+      <FileUploader @completeOneFile="getUploadFile" class="file-uploader">
+        <template v-slot:center>
+          <i class="icon-add"></i>
+        </template>
+      </FileUploader>
     </div>
   </div>
 </template>
@@ -48,6 +49,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.icon-add {
+  text-align: center;
+
+  font-size: 60rem;
+}
 .preview-image-container {
   display: flex;
   align-items: center;
@@ -81,9 +87,11 @@ export default {
     width: 128rem;
     background-color: #ccc;
     .file-uploader {
-      margin-left: 8rem;
-      height: 100rem;
-      width: 100rem;
+      height: 110rem;
+      width: 128rem;
+      align-items: center;
+      justify-content: center;
+      display: flex;
     }
     .icon-back {
       font-size: 20rem;

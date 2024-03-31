@@ -184,7 +184,7 @@ export default {
                 }
               })
               .catch((error) => {
-                f.resume();
+                file.resume();
                 taskStore.updateTaskStatus({
                   filename: file.name,
                   status: fileUtil.taskStatus.WAITING.code,

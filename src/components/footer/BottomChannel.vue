@@ -45,6 +45,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.icon-add {
+  font-size: 36rem;
+}
 .tab-item {
   display: flex;
   flex-grow: 1;

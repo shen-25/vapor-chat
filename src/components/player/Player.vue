@@ -12,14 +12,13 @@ export default {
     videoUrl: {
       type: String,
       default() {
-        return "http://zengshen.org:9000/minio-upload/2023-08-23/%E9%98%B4%E6%99%B4%E8%A1%A5%E4%B8%81.mp4";
+        return "";
       },
     },
     // 预览图片
     poster: {
       type: String,
-      default: () =>
-        "http://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/byted-player-videos/1.0.0/poster.jpg",
+      default: () => "",
     },
     // 内联模式
     playsinline: {
@@ -35,17 +34,21 @@ export default {
       default: "100%",
     },
   },
-  emits: ["triggerEvent"],
+  emits: ["triggerEvent", "onClick"],
   setup(props, { emit }) {
+    const player = ref(null);
     onMounted(() => {
+      if (!props.videoUrl) {
+        return;
+      }
       initPlayer();
     });
     onUnmounted(() => {
-      player.value.destroy();
-      player.value = null;
+      if (player.value) {
+        player.value.destroy();
+        player.value = null;
+      }
     });
-
-    const player = ref(null);
 
     function initPlayer() {
       const config = {
@@ -92,6 +95,9 @@ export default {
         player.value.on("pause", () => {
           emit("triggerEvent", false);
         });
+        player.value.on("pause", function () {
+          emit("onClick");
+        });
         //监听 视频退出全屏
         player.value.on("exitFullscreen", () => {
           window.scrollTo(0, 0);
@@ -99,6 +105,7 @@ export default {
         });
       }
     }
+
     watch(
       () => props.videoUrl,
       (newUrl) => {
@@ -109,6 +116,9 @@ export default {
         }
       }
     );
+    return {
+      player,
+    };
   },
 };
 </script>
