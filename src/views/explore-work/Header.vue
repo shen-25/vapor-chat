@@ -21,7 +21,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: "ExploreBack",
@@ -39,7 +38,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .explore-header-container {
-  height: 64rem;
+  height: 60rem;
   background-color: #fff;
   display: flex;
   align-items: center;
