@@ -11,11 +11,7 @@
       <div class="userInfo">
         <div class="avatar">
           <div class="avatar-ctn">
-            <img
-              class="avatar"
-              src="@\assets\images\icon\avatar\2.png"
-              alt=""
-            />
+            <img class="avatar" :src="userInfo.avatarUrl" alt="" />
             <img
               class="change"
               src="../../../assets/images/icon/me/camera-light.png"
@@ -24,60 +20,58 @@
           </div>
           <span>点击更换头像</span>
         </div>
-        <div class="row" @click="showEditItem(1)">
+        <div class="row" @click="onEditItem(1)">
           <div class="left">名字</div>
           <div class="right">
-            <span>我是撒地方</span>
+            <span>{{ userInfo.nickname }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
-        <div class="row" @click="showEditItem(2)">
+        <div class="row" @click="onEditItem(2)">
           <div class="left">抖音号</div>
           <div class="right">
-            <span>q32443243234</span>
+            <span>{{ userInfo.shortname }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
-        <div class="row" @click="showEditItem(3)">
+        <div class="row" @click="onEditItem(3)">
           <div class="left">简介</div>
           <div class="right">
-            <span>weqrojfkalsdsfkafs</span>
+            <span>{{ userInfo.signature }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
         <div class="row" @click="showSexBtn">
           <div class="left">性别</div>
           <div class="right">
-            <span>男</span>
+            <span>{{ getSexName() }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
         <div class="row" @click="showBirthdayBtn">
           <div class="left">生日</div>
           <div class="right">
-            <span>1012-10-10</span>
+            <span>{{ userInfo.birthday }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
         <div class="row" @click="showLocationBtn">
           <div class="left">所在地</div>
           <div class="right">
-            <span>中国-东莞</span>
+            <span>{{ userInfo.province }}- {{ userInfo.city }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
         <div class="row" @click="showSchoolBtn">
           <div class="left">学校</div>
           <div class="right">
-            <span>东莞理工学院</span>
+            <span>{{ userInfo.college }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
       </div>
     </div>
 
-    <router-view></router-view>
-    <!-- 底部弹出 -->
     <van-popup
       v-model:show="showSexPopup"
       position="bottom"
@@ -85,11 +79,11 @@
       :style="{ height: '27.6%', color: '#000' }"
     >
       <div class="sex-container">
-        <div class="item" @click="showSexBtn">男</div>
-        <div class="item" @click="showSexBtn">女</div>
-        <div class="item border-btm-hide" @click="showSexBtn">不展示</div>
+        <div class="item" @click="onSexBtn(1)">男</div>
+        <div class="item" @click="onSexBtn(2)">女</div>
+        <div class="item border-btm-hide" @click="onSexBtn(3)">保密</div>
         <div class="item-interval"></div>
-        <div class="item border-btm-hide" @click="showSexBtn">取消</div>
+        <div class="item border-btm-hide" @click="onSexBtn(4)">取消</div>
       </div>
     </van-popup>
 
@@ -97,30 +91,51 @@
       v-model:show="showBirthdayPopup"
       position="bottom"
       :style="{ height: '40%' }"
-      ><ChooseBirthday
+    >
+      <van-date-picker
+        v-model="currentDate"
+        title="选择你的生日"
+        :min-date="minDate"
+        :max-date="maxDate"
+        @confirm="onBirthDayConfirmBtn"
     /></van-popup>
     <van-popup
       v-model:show="showLocationPopup"
       position="bottom"
       :style="{ height: '38%' }"
+      @click="onLocationBtn"
     >
-      <van-area title="选择地区" :area-list="areaList" />
+      <van-area
+        title="选择地区"
+        :area-list="areaList"
+        v-model="locationCode"
+        columns-num="2"
+      />
     </van-popup>
+    <EditUserInfoItem
+      :type="showBasicType"
+      :userInfo="userInfo"
+      v-if="showEditItem"
+      @toggleItem="toggleItem"
+    ></EditUserInfoItem>
   </div>
 </template>
 
 <script>
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import BaseHeader from "@/components/base/back/BaseHeader.vue";
-import ChooseBirthday from "./ChooseBirthday.vue";
 import { areaList } from "@vant/area-data";
+import EditUserInfoItem from "../components/EditUserInfoItem.vue";
+import { getUserInfoApi } from "@/api/user/user";
+import { useUserStore } from "@/store/user";
+import { editUserInfoApi } from "@/api/user/user";
 
 export default {
   name: "EditUserInfo",
   components: {
     BaseHeader,
-    ChooseBirthday,
+    EditUserInfoItem,
   },
   setup() {
     const router = useRouter();
@@ -131,35 +146,134 @@ export default {
 
     const showLocationPopup = ref(false);
 
-    function showEditItem(val) {
-      router.push(`/me/edit-userinfo/${val}`);
-    }
+    const userInfo = ref({});
+
+    const userStore = useUserStore();
+
+    const showEditItem = ref(false);
+
+    const showBasicType = ref(1);
+
+    const locationCode = ref(null);
+
+    const date = new Date();
+
+    const currentDate = ref(["2021", "01", "01"]);
+
+    const minDate = new Date(1900, 0, 1);
+    const maxDate = ref(
+      new Date(date.getFullYear(), date.getMonth() + 1, date.getDate())
+    );
 
     function showBirthdayBtn() {
       showBirthdayPopup.value = !showBirthdayPopup.value;
     }
     function showSexBtn() {
-      showSexPopup.value = !showSexPopup.value;
+      showSexPopup.value = true;
     }
     function showLocationBtn() {
       showLocationPopup.value = !showLocationPopup.value;
     }
-
-    function showSchoolBtn() {
-      router.push("/me/edit/chooseSchool");
+    function showSchoolBtn() {}
+    function onEditItem(val) {
+      showBasicType.value = val;
+      showEditItem.value = true;
     }
+    function toggleItem(val) {
+      showEditItem.value = false;
+      if (val) {
+        getUserInfo();
+      }
+    }
+    async function getUserInfo() {
+      const param = {
+        userId: userStore.getUserId(),
+      };
+      const { msg, code, data } = await getUserInfoApi(param);
+      if (code === 0) {
+        userInfo.value = data;
+        if (userInfo.value.birthday) {
+          currentDate.value = userInfo.value.birthday.split("-");
+        }
+      }
+    }
+    /**
+     * 第一个参数是sex
+     * 第二个是日期
+     * 第三个是地区
+     * 后端做了判断，如果为空则不更新
+     */
+    async function editUserInfo(sex, date, location) {
+      const param = {
+        userId: userStore.getUserId(),
+        sex,
+        birthday: date,
+        ...location,
+      };
+      const { msg, data, code } = await editUserInfoApi(param);
+      if (code == 0) {
+      }
+    }
+    function getSexName() {
+      if (userInfo.value.sex == 1) {
+        return "男";
+      }
+      if (userInfo.value.sex == 2) {
+        return "女";
+      } else {
+        return "保密";
+      }
+    }
+    async function onSexBtn(sex) {
+      if (sex == 1 || sex == 2 || sex == 3) {
+        await editUserInfo(sex);
+        userInfo.value.sex = sex;
+        showSexPopup.value = !showSexPopup.value;
+      }
+    }
+    async function onBirthDayConfirmBtn() {
+      const date = currentDate.value.join("-");
+      await editUserInfo(null, date);
+      userInfo.value.birthday = date;
+      showBirthdayPopup.value = false;
+    }
+    async function onLocationBtn() {
+      console.log(locationCode.value);
+      const province =
+        areaList.province_list[
+          locationCode.value.toString().substr(0, 2) + "0000"
+        ];
+      const city = areaList.city_list[locationCode.value];
+      await editUserInfo(null, null, { province, city, country: "中国" });
+      userInfo.value.province = province;
+      userInfo.value.city = city;
+      showLocationPopup.value = false;
+    }
+
+    onMounted(async () => {});
+    getUserInfo();
     return {
       showEditItem,
+      onEditItem,
+      getSexName,
       showSexPopup,
-      showSexBtn,
       showBirthdayPopup,
-
       showBirthdayBtn,
       showLocationPopup,
-
       showLocationBtn,
       areaList,
       showSchoolBtn,
+      userInfo,
+      toggleItem,
+      showBasicType,
+      onSexBtn,
+      showSexBtn,
+      currentDate,
+      minDate,
+      maxDate,
+      onBirthDayConfirmBtn,
+      onLocationBtn,
+      locationCode,
     };
   },
 };

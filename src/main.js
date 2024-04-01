@@ -21,6 +21,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Cell,
+  Dialog,
 } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
@@ -35,6 +36,7 @@ app.provide("$imSdk", useImClient);
 
 app.use(router);
 app.use(Form);
+app.use(Dialog);
 app.use(Field);
 app.use(CellGroup);
 app.use(Cell);

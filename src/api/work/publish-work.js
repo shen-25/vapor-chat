@@ -4,6 +4,7 @@ const WorkPostAPi = {
   publish: "/work/workPost/publish",
   discovery: "/work/workPost/discovery",
   getPostDetail: "/work/workPost/getDetail",
+  myPost: "/work/workPost/get/me",
 };
 
 /**
@@ -27,6 +28,16 @@ export function getWorkListApi(param) {
 
 export function getWorkPostDetailApi(param) {
   return request.get(WorkPostAPi.getPostDetail, {
+    params: param,
+  });
+}
+
+/**
+ * 获取指定用户的workList
+ * @param {*} data 登录参数
+ */
+export function getMyWorkListApi(param) {
+  return request.get(WorkPostAPi.myPost, {
     params: param,
   });
 }

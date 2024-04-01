@@ -120,12 +120,13 @@ export default {
     // 通过 actions 属性来定义菜单选项
     const actions = [
       { text: "发起群聊", icon: "chat-o" },
-      { text: "添加朋友", icon: "add-o" },
+      { text: "加好友/群", icon: "add-o" },
     ];
     function onAddSelect(action) {
       if (action.text == "发起群聊") {
         router.push("/group/add");
       } else {
+        router.push("/friend/find");
       }
     }
     getConversation();

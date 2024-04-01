@@ -1,16 +1,19 @@
 <template>
-  <div class="login-container">
+  <div class="register-container">
+    <div class="header">
+      <i class="icon-back" @click="goBack"></i>
+    </div>
     <div class="main">
       <van-form @submit="onSubmit">
         <van-cell-group inset>
           <van-field
-            v-model="loginModel.mobile"
-            name="输入账号"
+            v-model="registerModel.mobile"
+            name="输入手机号"
             placeholder="输入手机号"
             :rules="[{ required: true, message: '请填写手机号' }]"
           />
           <van-field
-            v-model="loginModel.password"
+            v-model="registerModel.password"
             class="password"
             type="password"
             name="密码"
@@ -20,78 +23,64 @@
         </van-cell-group>
         <div style="margin: 16px">
           <van-button block type="primary" native-type="submit">
-            登录
+            注册
           </van-button>
         </div>
       </van-form>
     </div>
     <div class="footer">
-      <div class="tip" @click="toRegister">
-        <i class="icon-add"></i><span>注册</span>
+      <div class="tip" @click="toLogin">
+        <i class="icon-add"></i><span>登录</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, inject } from "vue";
-import { loginApi } from "@/api/user/user.js";
+import { ref } from "vue";
+import { registerApi } from "@/api/user/user.js";
 import { useRouter } from "vue-router";
-import { useUserStore } from "@/store/user";
-import WebToolkit from "@/im/utils/web-tool-kit";
 export default {
   name: "login",
 
   setup() {
-    const imSdk = inject("$imSdk");
     const router = useRouter();
-    const userStore = useUserStore();
-
-    const loginModel = ref({
+    const registerModel = ref({
       mobile: "",
       password: "",
-      loginType: 1,
+      roleId: "1774613111052046336",
     });
 
     async function onSubmit() {
-      const { code, msg, data } = await loginApi({
-        mobile: loginModel.value.mobile,
-        password: loginModel.value.password,
+      const { code, msg, data } = await registerApi({
+        mobile: registerModel.value.mobile,
+        password: registerModel.value.password,
+        roleId: registerModel.value.roleId,
       });
       if (code !== 0) {
         // 登录失败
       } else {
-        console.log(data);
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        userStore.setUserInfo(data);
-        const imei = WebToolkit.getDeviceInfo().system;
-        await imSdk.initIm(
-          "",
-          data.appId,
-          data.userId,
-          imei,
-          data.userSign,
-          function (sdk) {
-            console.log(imei);
-            router.push("/message");
-          }
-        );
+        toLogin();
       }
     }
-    function toRegister() {
-      router.push("/register");
+    function toLogin() {
+      router.push("/login");
+    }
+    function goBack() {
+      router.back();
     }
     return {
-      loginModel,
+      registerModel,
       onSubmit,
-      toRegister,
+      toLogin,
+      goBack,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.login-container {
+.register-container {
   background-color: aliceblue;
   position: fixed;
   width: 100%;
@@ -102,10 +91,18 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
+  .header {
+    height: 50rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8rem 16rem;
+    .icon-back {
+      font-size: 26rem;
+    }
+  }
   .main {
     height: 240rem;
-    margin-top: 160rem;
     padding: 0 20rem;
     .account {
       margin-bottom: 10rem;

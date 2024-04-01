@@ -7,7 +7,7 @@
       </div>
       <transition name="fade">
         <div class="center" v-if="floatFixed">
-          <p class="name f15 mt1r mb1r">我是阿斯蒂芬</p>
+          <p class="name f15 mt1r mb1r">{{ userInfo.nickname }}</p>
         </div>
       </transition>
 
@@ -30,18 +30,20 @@
       class="me-content"
       :probe-type="3"
       @scroll="onScroll"
-      ref="scrollRef"
+      ref="scrollRef "
     >
       <div>
         <div class="desc">
-          <header>
+          <header
+            :style="{ 'background-image': `url(${userInfo.bgImageUrl})` }"
+          >
             <div class="info">
-              <img src="../../assets/images/icon/avatar/2.png" class="avatar" />
+              <img :src="userInfo.avatarUrl" class="avatar" />
               <div class="right">
-                <p class="name">我是曾深啊</p>
+                <p class="name">{{ userInfo.nickname }}</p>
                 <div class="number mb1r">
                   <span class="mr1r">私密账号</span>
-                  <span>抖音号：123443423</span>
+                  <span>短号: {{ userInfo.shortname }}</span>
                   <img
                     src="../../assets/images/icon/me/qrcode-gray.png"
                     alt=""
@@ -79,22 +81,22 @@
               </template>
             </div>
             <div class="more">
-              <div class="age item" v-if="!userinfo">
+              <div class="age item" v-if="!userInfo">
                 <img
-                  v-if="userinfo == 0"
+                  v-if="userInfo == 0"
                   src="../../assets/images/icon/me/woman.png"
                   alt=""
                 />
                 <img
-                  v-if="userinfo != 1"
+                  v-if="userInfo != 1"
                   src="../../assets/images/icon/me/man.png"
                   alt=""
                 />
                 <span>11岁</span>
               </div>
-              <div class="item" v-if="userinfo || !userinfo">
+              <div class="item" v-if="userInfo || !userInfo">
                 广东省
-                <template v-if="userinfo && !userinfo"> - </template>
+                <template v-if="userInfo && !userInfo"> - </template>
                 东莞
               </div>
               <div class="item">东莞理工学院</div>
@@ -126,7 +128,15 @@
           v-model:currentTabIndex="currentTabIndex"
         >
         </Indicator>
-        <Preview :postList="postList" @select="selectWork" />
+        <div ref="rootRef" class="preview-container">
+          <Preview :postList="myWorkPostList" @select="selectWork"></Preview>
+        </div>
+        <div ref="rootRef" v-if="currentTabIndex == 1">
+          <Preview :postList="myWorkPostList" @select="selectWork"></Preview>
+        </div>
+        <div ref="rootRef" v-if="currentTabIndex == 2">
+          <Preview :postList="likeWorkPostList" @select="selectWork"></Preview>
+        </div>
       </div>
     </Scroll>
   </div>
@@ -144,9 +154,14 @@
 import Indicator from "@/components/slide/Indicator";
 import Scroll from "@/components/base/scroll/Scroll";
 import Preview from "@/components/preview/index.vue";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import Footer from "@/components/footer/Footer.vue";
+import { getUserInfoApi } from "@/api/user/user";
+import { useUserStore } from "@/store/user";
+import { getMyWorkListApi } from "@/api/work/publish-work";
+import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
+
 export default {
   name: "Me",
   components: {
@@ -171,7 +186,9 @@ export default {
       },
     ];
     const router = useRouter();
-    const userinfo = ref(null);
+    const userStore = useUserStore();
+
+    const userInfo = ref({});
     const scrollRef = ref(null);
     const scrollY = ref(0);
 
@@ -180,8 +197,6 @@ export default {
     const floatFixed = ref(false);
 
     const currentTabIndex = ref(0);
-
-    const postList = ref([]);
 
     const slideRowListStyle = computed(() => {
       return {
@@ -204,19 +219,16 @@ export default {
     });
 
     watch(currentTabIndex, () => {
-      console.log(currentTabIndex.value);
       if (currentTabIndex.value == 1) {
-        postList.value = [1, 2, 3];
       } else if (currentTabIndex.value == 2) {
-        postList.value = [1];
+        likeWorkPostList.value = [1, 1, 2];
       } else {
-        postList.value = [1, 2, 3, 4, 5, 6, 10, 8, 9];
       }
     });
 
     function editUserBtn() {
       router.push({
-        path: `/me/edit-userinfo`,
+        path: `/me/userInfo/edit`,
       });
     }
     function onScroll(pos) {
@@ -232,10 +244,98 @@ export default {
         showFixedIndicator.value = false;
       }
     }
+
+    async function getUserInfo() {
+      const param = {
+        userId: userStore.getUserId(),
+      };
+      const { msg, code, data } = await getUserInfoApi(param);
+      if (code === 0) {
+        userInfo.value = data;
+      }
+    }
+
+    //
+    const myWorkPostList = ref([]);
+
+    // requestModel
+    const page = ref(1);
+    const pageSize = ref(2);
+    const isLastPage = ref(false);
+
+    const loading = computed(() => {
+      return !myWorkPostList.value && !myWorkPostList.value.length;
+    });
+
+    const preventPullUpLoad = computed(() => {
+      return loading.value || isLastPage.value;
+    });
+
+    const { rootRef, isPullUPload, scroll } = usePullUpLoad(
+      searchMore,
+      preventPullUpLoad
+    );
+
+    async function searchFirst() {
+      const param = {
+        userId: userStore.getUserId(),
+        page: page.value,
+        pageSize: pageSize.value,
+      };
+      try {
+        const { code, msg, data } = await getMyWorkListApi(param);
+        if (code !== 0) {
+          return;
+        }
+        // 修改页码和数据总条数、表格赋值
+        myWorkPostList.value = data.list || [];
+        isLastPage.value = data.isLastPage;
+        page.value = page.value + 1;
+      } catch (e) {
+      } finally {
+      }
+    }
+
+    async function searchMore() {
+      const param = {
+        userId: userStore.getUserId(),
+        page: page.value,
+        pageSize: pageSize.value,
+      };
+      try {
+        const { code, msg, data } = await getMyWorkListApi(param);
+        if (code !== 0) {
+          return;
+        }
+        // 修改页码和数据总条数、表格赋值
+        myWorkPostList.value = myWorkPostList.value.concat(data.list);
+        isLastPage.value = data.isLastPage;
+        page.value = page.value + 1;
+      } catch (e) {
+      } finally {
+      }
+    }
+
+    function selectWork(work) {
+      if (work.type == 0) {
+        router.push(`/recommend/video/${work.postId}`);
+      } else if (work.type === 1) {
+        router.push(`/recommend/${work.postId}`);
+      }
+    }
+
+    const likeWorkPostList = ref([]);
+
+    onMounted(async () => {
+      await getUserInfo();
+    });
+    searchFirst();
+
     return {
       slideRowListStyle,
       editUserBtn,
-      userinfo,
+      selectWork,
+      userInfo,
       scrollRef,
       onScroll,
       floatCls,
@@ -244,14 +344,20 @@ export default {
       tabCls,
       showFixedIndicator,
       currentTabIndex,
-      postList,
       tabTexts,
+      rootRef,
+      myWorkPostList,
+      likeWorkPostList,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.preview-container {
+  height: 100%;
+  overflow: hidden;
+}
 .tabCls {
   position: fixed;
   top: 45rem;
@@ -343,7 +449,6 @@ export default {
     position: relative;
     color: white;
     height: 190rem;
-    background-image: url("../../assets/images/header-bg.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -353,11 +458,13 @@ export default {
     .info {
       position: absolute;
       bottom: 10rem;
+      left: 0;
+      right: 0;
       padding: 20rem;
       display: flex;
       align-items: center;
       gap: 15rem;
-
+      color: #000;
       .avatar {
         background: black;
         padding: 2px;
@@ -365,17 +472,14 @@ export default {
         width: 100rem;
         height: 100rem;
       }
-
       .name {
         font-size: 18rem;
         margin-bottom: 5rem;
       }
-
       .number {
         font-size: 12rem;
         display: flex;
         align-items: center;
-
         img {
           width: 12rem;
           margin-left: 5rem;

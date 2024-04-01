@@ -45,7 +45,7 @@
 <script>
 import { ref, onBeforeUpdate } from "vue";
 import IndexList from "@/views/friend/index-list/index.vue";
-import { getAllFriendshipApi } from "@/api/friendship";
+import { getAllFriendshipApi } from "@/api/friendship/friendship";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
 import { addGroupApi } from "@/api/group/group";

@@ -159,10 +159,10 @@ export default {
     function hideCommentDiv() {
       showInputDiv.value = false;
     }
-
     getWorkPostDetail(router.currentRoute.value.params.id);
 
     getCommentList();
+    onMounted(() => {});
 
     return {
       sliders,

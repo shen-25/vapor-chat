@@ -35,7 +35,7 @@
 import { ref, onCreated } from "vue";
 import Footer from "@/components/footer/Footer.vue";
 import IndexList from "./index-list/index.vue";
-import { getAllFriendshipNamePinyinApi } from "@/api/friendship";
+import { getAllFriendshipNamePinyinApi } from "@/api/friendship/friendship";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
