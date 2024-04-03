@@ -23,10 +23,11 @@ export default {
 <style lang="scss" scoped>
 .header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   height: 44px;
   text-align: center;
   font-size: 0;
+  margin: 0rem 10rem;
   .left {
     .icon-nav {
       display: block;
@@ -37,8 +38,8 @@ export default {
   .nav {
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    width: 60%;
+    justify-content: flex-start;
+    width: 34%;
     margin: 0px 10px;
   }
   .search {

@@ -76,8 +76,7 @@
             </div>
             <div class="signature">
               <template v-if="true">
-                <span>点击添加介绍，让大家认识你...</span>
-                <img src="../../assets/images/icon/me/write-gray.png" alt="" />
+                <span>{{ getSignature() }}</span>
               </template>
             </div>
             <div class="more">
@@ -95,11 +94,11 @@
                 <span>11岁</span>
               </div>
               <div class="item" v-if="userInfo || !userInfo">
-                广东省
+                {{ userInfo.province }}
                 <template v-if="userInfo && !userInfo"> - </template>
-                东莞
+                {{ userInfo.city }}
               </div>
-              <div class="item">东莞理工学院</div>
+              <div class="item">{{ userInfo.school }}</div>
             </div>
             <div class="other">
               <div class="item">
@@ -128,14 +127,8 @@
           v-model:currentTabIndex="currentTabIndex"
         >
         </Indicator>
-        <div ref="rootRef" class="preview-container">
+        <div class="preview-container" ref="rootRef">
           <Preview :postList="myWorkPostList" @select="selectWork"></Preview>
-        </div>
-        <div ref="rootRef" v-if="currentTabIndex == 1">
-          <Preview :postList="myWorkPostList" @select="selectWork"></Preview>
-        </div>
-        <div ref="rootRef" v-if="currentTabIndex == 2">
-          <Preview :postList="likeWorkPostList" @select="selectWork"></Preview>
         </div>
       </div>
     </Scroll>
@@ -161,7 +154,10 @@ import { getUserInfoApi } from "@/api/user/user";
 import { useUserStore } from "@/store/user";
 import { getMyWorkListApi } from "@/api/work/publish-work";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
-
+import {
+  getWorkCollectPageListApi,
+  getWorkLikedPageListApi,
+} from "@/api/work/publish-work";
 export default {
   name: "Me",
   components: {
@@ -219,11 +215,10 @@ export default {
     });
 
     watch(currentTabIndex, () => {
-      if (currentTabIndex.value == 1) {
-      } else if (currentTabIndex.value == 2) {
-        likeWorkPostList.value = [1, 1, 2];
-      } else {
-      }
+      myWorkPostList.value = [];
+      isLastPage.value = false;
+      page.value = 1;
+      searchFirst();
     });
 
     function editUserBtn() {
@@ -257,7 +252,6 @@ export default {
 
     //
     const myWorkPostList = ref([]);
-
     // requestModel
     const page = ref(1);
     const pageSize = ref(2);
@@ -283,13 +277,27 @@ export default {
         pageSize: pageSize.value,
       };
       try {
-        const { code, msg, data } = await getMyWorkListApi(param);
-        if (code !== 0) {
+        let tmpCode = 1;
+        let tempData;
+        if (currentTabIndex.value == 0) {
+          const { code, msg, data } = await getMyWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else if (currentTabIndex.value == 2) {
+          const { code, msg, data } = await getWorkLikedPageListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else if (currentTabIndex.value == 3) {
+          const { code, msg, data } = await getWorkCollectPageListApi(param);
+          tmpCode = code;
+          tempData = data;
+        }
+        if (tmpCode !== 0) {
           return;
         }
         // 修改页码和数据总条数、表格赋值
-        myWorkPostList.value = data.list || [];
-        isLastPage.value = data.isLastPage;
+        myWorkPostList.value = tempData.list || [];
+        isLastPage.value = tempData.isLastPage;
         page.value = page.value + 1;
       } catch (e) {
       } finally {
@@ -303,13 +311,27 @@ export default {
         pageSize: pageSize.value,
       };
       try {
-        const { code, msg, data } = await getMyWorkListApi(param);
-        if (code !== 0) {
+        let tmpCode = 1;
+        let tempData;
+        if (currentTabIndex.value == 0) {
+          const { code, msg, data } = await getMyWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else if (currentTabIndex.value == 2) {
+          const { code, msg, data } = await getWorkLikedPageListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else if (currentTabIndex.value == 3) {
+          const { code, msg, data } = await getWorkCollectPageListApi(param);
+          tmpCode = code;
+          tempData = data;
+        }
+        if (tmpCode !== 0) {
           return;
         }
         // 修改页码和数据总条数、表格赋值
-        myWorkPostList.value = myWorkPostList.value.concat(data.list);
-        isLastPage.value = data.isLastPage;
+        myWorkPostList.value = myWorkPostList.value.concat(tempData.list);
+        isLastPage.value = tempData.isLastPage;
         page.value = page.value + 1;
       } catch (e) {
       } finally {
@@ -323,13 +345,26 @@ export default {
         router.push(`/recommend/${work.postId}`);
       }
     }
+    watch(
+      () => router.currentRoute.value.query.refresh,
+      (newRefresh, old) => {
+        if (newRefresh) {
+          getUserInfo();
+        }
+      }
+    );
+    function getSignature() {
+      if (userInfo.value.signature) {
+        return userInfo.value.signature;
+      } else {
+        return "点击添加介绍，让大家认识你...";
+      }
+    }
 
     const likeWorkPostList = ref([]);
-
-    onMounted(async () => {
-      await getUserInfo();
-    });
     searchFirst();
+
+    getUserInfo();
 
     return {
       slideRowListStyle,
@@ -348,6 +383,7 @@ export default {
       rootRef,
       myWorkPostList,
       likeWorkPostList,
+      getSignature,
     };
   },
 };
@@ -358,6 +394,7 @@ export default {
   height: 100%;
   overflow: hidden;
 }
+
 .tabCls {
   position: fixed;
   top: 45rem;
@@ -454,7 +491,7 @@ export default {
     background-repeat: no-repeat;
 
     box-sizing: border-box;
-
+    opacity: 0.9;
     .info {
       position: absolute;
       bottom: 10rem;
@@ -465,6 +502,7 @@ export default {
       align-items: center;
       gap: 15rem;
       color: #000;
+      opacity: 1;
       .avatar {
         background: black;
         padding: 2px;

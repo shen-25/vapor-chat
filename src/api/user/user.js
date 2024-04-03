@@ -6,6 +6,7 @@ const UserApi = {
   getUserInfo: "/user/getUserInfo",
   editUserInfo: "/user/edit/info",
   getByNameOrMobile: "/user/getByNameOrMobile",
+  editUserEduction: "/user/edit/eduction",
 };
 
 /**
@@ -38,6 +39,11 @@ export function getUserInfoApi(param) {
 
 export function editUserInfoApi(param) {
   return request.post(UserApi.editUserInfo, {
+    data: param,
+  });
+}
+export function editUserEductionApi(param) {
+  return request.post(UserApi.editUserEduction, {
     data: param,
   });
 }

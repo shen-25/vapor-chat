@@ -74,6 +74,9 @@ import { useUserStore } from "@/store/user";
 import { cloneDeep } from "lodash-es";
 import { editUserInfoApi } from "@/api/user/user";
 import { ref, watch } from "vue";
+import WebToolkit from "@/im/utils/web-tool-kit";
+import { getClientType } from "@/utils/client-type";
+import { APP_ID } from "@/config/setting";
 export default {
   name: "editUserInfoItem",
   props: {
@@ -109,8 +112,12 @@ export default {
     }
 
     async function editUserInfo() {
+      const imei = WebToolkit.getDeviceInfo().system;
       const param = {
         userId: userStore.getUserId(),
+        appId: APP_ID,
+        imei,
+        clientType: getClientType(imei),
       };
       if (props.type == 1) {
         param.nickname = nickname.value;

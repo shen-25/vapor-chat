@@ -1,23 +1,30 @@
 <template>
   <div>
     <div class="container">
-      <BaseHeader>
-        <template v-slot:center>
-          <div class="title">
-            <span class="f16">编辑资料</span>
-          </div>
-        </template>
-      </BaseHeader>
+      <div class="header">
+        <div class="left" @click="goBack">
+          <i class="icon-back"></i>
+        </div>
+        <div class="middle">
+          <div class="title">编辑资料</div>
+        </div>
+        <div class="right"></div>
+      </div>
       <div class="userInfo">
         <div class="avatar">
-          <div class="avatar-ctn">
-            <img class="avatar" :src="userInfo.avatarUrl" alt="" />
-            <img
-              class="change"
-              src="../../../assets/images/icon/me/camera-light.png"
-              alt=""
-            />
-          </div>
+          <FileUploader
+            @completeOneFile="getUploadFile"
+            class="file-uploader avatar-ctn"
+          >
+            <template v-slot:center>
+              <img class="avatar" :src="userInfo.avatarUrl" alt="" />
+              <img
+                class="change"
+                src="../../../assets/images/icon/me/camera-light.png"
+                alt=""
+              />
+            </template>
+          </FileUploader>
           <span>点击更换头像</span>
         </div>
         <div class="row" @click="onEditItem(1)">
@@ -62,10 +69,10 @@
             <i class="icon-right-back"></i>
           </div>
         </div>
-        <div class="row" @click="showSchoolBtn">
+        <div class="row" @click="onChooseSchoolBtn">
           <div class="left">学校</div>
           <div class="right">
-            <span>{{ userInfo.college }}</span>
+            <span>{{ userInfo.school }}</span>
             <i class="icon-right-back"></i>
           </div>
         </div>
@@ -118,6 +125,11 @@
       v-if="showEditItem"
       @toggleItem="toggleItem"
     ></EditUserInfoItem>
+    <ChooseSchool
+      v-if="showChooseSchool"
+      :data="userInfo"
+      @close="closeChooseSchool"
+    />
   </div>
 </template>
 
@@ -130,12 +142,18 @@ import EditUserInfoItem from "../components/EditUserInfoItem.vue";
 import { getUserInfoApi } from "@/api/user/user";
 import { useUserStore } from "@/store/user";
 import { editUserInfoApi } from "@/api/user/user";
-
+import FileUploader from "@/components/file-uploader";
+import WebToolkit from "@/im/utils/web-tool-kit";
+import { getClientType } from "@/utils/client-type";
+import { APP_ID } from "@/config/setting";
+import ChooseSchool from "../components/ChooseSchool.vue";
 export default {
   name: "EditUserInfo",
   components: {
     BaseHeader,
     EditUserInfoItem,
+    FileUploader,
+    ChooseSchool,
   },
   setup() {
     const router = useRouter();
@@ -203,12 +221,17 @@ export default {
      * 第三个是地区
      * 后端做了判断，如果为空则不更新
      */
-    async function editUserInfo(sex, date, location) {
+    async function editUserInfo(sex, date, location, avatar) {
+      const imei = WebToolkit.getDeviceInfo().system;
       const param = {
         userId: userStore.getUserId(),
         sex,
         birthday: date,
         ...location,
+        avatar,
+        appId: APP_ID,
+        imei,
+        clientType: getClientType(imei),
       };
       const { msg, data, code } = await editUserInfoApi(param);
       if (code == 0) {
@@ -250,6 +273,23 @@ export default {
       showLocationPopup.value = false;
     }
 
+    function getUploadFile(fileUrl) {
+      editUserInfo(null, null, null, fileUrl);
+      userInfo.value.avatarUrl = fileUrl;
+    }
+
+    const showChooseSchool = ref(false);
+
+    function onChooseSchoolBtn() {
+      showChooseSchool.value = true;
+    }
+
+    function closeChooseSchool(isUpdated) {
+      showChooseSchool.value = false;
+    }
+    function goBack() {
+      router.push({ path: "/me", query: { refresh: true } });
+    }
     onMounted(async () => {});
     getUserInfo();
     return {
@@ -274,6 +314,11 @@ export default {
       onBirthDayConfirmBtn,
       onLocationBtn,
       locationCode,
+      getUploadFile,
+      onChooseSchoolBtn,
+      showChooseSchool,
+      closeChooseSchool,
+      goBack,
     };
   },
 };
@@ -290,6 +335,24 @@ export default {
   font-size: 14rem;
   background: #fff;
   z-index: 100;
+}
+.header {
+  display: flex;
+  height: 52rem;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18rem;
+  margin: 0 10rem;
+  .left {
+    .icon-back {
+      font-size: 24rem;
+    }
+  }
+  .right {
+    .icon-tip {
+      font-size: 28rem;
+    }
+  }
 }
 
 .title {

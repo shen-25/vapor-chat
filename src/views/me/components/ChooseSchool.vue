@@ -5,7 +5,7 @@
         <span class="f16">添加学校</span>
       </template>
       <template v-slot:right>
-        <div>
+        <div @click="onSave">
           <span
             class="f16"
             :class="isChanged ? 'changed' : 'no-changed'"
@@ -16,40 +16,134 @@
       </template>
     </BaseHeader>
     <div class="content">
-      <div class="item">
-        <div class="left">学校</div>
-        <div class="right">
-          <span>东莞理工学院</span>
-          <i class="icon-right-back"></i>
-        </div>
-      </div>
-      <div class="item">
-        <div class="left">入学时间</div>
-        <div class="right">
-          <span>2020</span>
-          <i class="icon-right-back"></i>
-        </div>
-      </div>
-      <div class="item">
-        <div class="left">学历</div>
-        <div class="right">
-          <span>本科</span>
-          <i class="icon-right-back"></i>
-        </div>
-      </div>
+      <van-field v-model="school" label="学校" placeholder="请输入学校" />
+      <van-field
+        v-model="enrollmentTime"
+        is-link
+        readonly
+        label="入学时间"
+        placeholder="选择你的入学时间"
+        @click="showYearPicker = true"
+      />
+      <van-field
+        v-model="educationText"
+        is-link
+        readonly
+        label="学历"
+        placeholder="选择你的学历"
+        @click="showEducationPicker = true"
+      />
+
+      <van-popup v-model:show="showEducationPicker" round position="bottom">
+        <van-picker
+          :columns="eductionColumns"
+          @cancel="showEducationPicker = false"
+          @confirm="onEductionConfirm"
+        />
+      </van-popup>
+      <van-popup v-model:show="showYearPicker" round position="bottom">
+        <van-date-picker
+          title="选择日期"
+          :columns-type="columnsType"
+          @cancel="showYearPicker = false"
+          @confirm="onYearConfirm"
+        />
+      </van-popup>
     </div>
   </div>
 </template>
 
 <script>
 import BaseHeader from "@/components/base/back/BaseHeader.vue";
+import { ref } from "vue";
+import { cloneDeep } from "lodash-es";
+import { useUserStore } from "@/store/user";
+import { editUserEductionApi } from "@/api/user/user";
 export default {
   name: "ChooseSchool",
+  props: {
+    data: {
+      type: Object,
+    },
+  },
   components: {
     BaseHeader,
   },
-  data() {
-    return {};
+  emits: ["close"],
+  setup(props, { emit }) {
+    const userStore = useUserStore();
+
+    const isChanged = ref(true);
+    const eductionColumns = [
+      { text: "专科", value: 1 },
+      { text: "本科", value: 2 },
+      { text: "硕士", value: 3 },
+      { text: "博士", value: 4 },
+    ];
+    const education = ref(cloneDeep(props.data.education));
+    const school = ref(cloneDeep(props.data.school));
+    const enrollmentTime = ref(
+      cloneDeep(props.data.enrollmentTime).substring(0, 4)
+    );
+    const showEducationPicker = ref(false);
+    const showYearPicker = ref(false);
+    const educationText = ref(getEductionText(props.data.education));
+
+    function getEductionText(val) {
+      if (val == 1) {
+        return "专科";
+      }
+      if (val == 2) {
+        return "本科";
+      }
+      if (val == 3) {
+        return "硕士";
+      }
+      if (val == 4) {
+        return "博士";
+      }
+      return "未知";
+    }
+
+    const onEductionConfirm = ({ selectedOptions }) => {
+      showEducationPicker.value = false;
+      education.value = selectedOptions[0].value;
+      educationText.value = selectedOptions[0].text;
+    };
+
+    const onYearConfirm = ({ selectedOptions }) => {
+      showYearPicker.value = false;
+      enrollmentTime.value = selectedOptions[0].value;
+    };
+    async function onSave() {
+      const param = {
+        school: school.value,
+        enrollmentTime: new Date(enrollmentTime.value),
+        education: education.value,
+        userId: userStore.getUserId(),
+      };
+      const { msg, code, data } = await editUserEductionApi(param);
+      if (code == 0) {
+        props.data.school = school.value;
+        props.data.enrollmentTime = enrollmentTime.value;
+        props.data.education = education.value;
+        emit("close", true);
+      }
+    }
+    const columnsType = ["year"];
+    return {
+      showEducationPicker,
+      eductionColumns,
+      onEductionConfirm,
+      columnsType,
+      enrollmentTime,
+      onYearConfirm,
+      showYearPicker,
+      educationText,
+      school,
+      onSave,
+      isChanged,
+    };
   },
 };
 </script>

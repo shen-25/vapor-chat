@@ -38,7 +38,7 @@
         <div class="title">
           <van-field v-model="postModel.title" placeholder="输入标题" />
         </div>
-        <div class="text">
+        <div class="text" v-if="!isUploadVideo">
           <van-field
             rows="4"
             v-model="postModel.text"

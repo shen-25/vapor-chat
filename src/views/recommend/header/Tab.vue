@@ -27,14 +27,6 @@ export default {
           name: "发现",
           path: "/recommend",
         },
-        {
-          name: "排行",
-          path: "/top-list",
-        },
-        {
-          name: "附近",
-          path: "/search",
-        },
       ],
     };
   },

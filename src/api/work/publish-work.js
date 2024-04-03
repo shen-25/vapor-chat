@@ -6,6 +6,8 @@ const WorkPostAPi = {
   getPostDetail: "/work/workPost/getDetail",
   myPost: "/work/workPost/get/me",
   getVideoWorkDetail: "/work/workPost/video/getDetail",
+  getWorkLikedPageList: "/work/workPost/get/like",
+  getWorkCollectPageList: "/work/workPost/get/collect",
 };
 
 /**
@@ -17,6 +19,26 @@ export function workPublishApi(data) {
     data: data,
   });
 }
+/**
+ * 获取用户喜欢的workList
+ * @param {*} data 登录参数
+ */
+export function getWorkLikedPageListApi(param) {
+  return request.get(WorkPostAPi.getWorkLikedPageList, {
+    params: param,
+  });
+}
+
+/**
+ * 获取用户收藏的workList
+ * @param {*} data 登录参数
+ */
+export function getWorkCollectPageListApi(param) {
+  return request.get(WorkPostAPi.getWorkCollectPageList, {
+    params: param,
+  });
+}
+
 /**
  * 获取用户的workList
  * @param {*} data 登录参数

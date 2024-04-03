@@ -133,6 +133,7 @@ export default {
             font-size: 12rem;
             line-height: 16rem;
             color: rgba(51, 51, 51, 0.6);
+            opacity: 1;
             .date {
               margin: 8rem 0;
             }
