@@ -5,6 +5,9 @@ const GroupApi = {
   getJoinGroup: "/v1/group/get/joined",
   getGroupInfo: "/v1/group/get/info",
   updateGroup: "/v1/group/update",
+  deleteGroup: "/v1/group/delete",
+
+  transferGroup: "/v1/group/transfer",
 };
 
 /**
@@ -34,6 +37,22 @@ export function getGroupInfoApi(param) {
  */
 export function updateBasicGroupApi(data) {
   return request.post(GroupApi.updateGroup, {
+    data,
+  });
+}
+/**
+ * 解散群聊
+ */
+export function deleteGroupGroupApi(data) {
+  return request.post(GroupApi.deleteGroup, {
+    data,
+  });
+}
+/**
+ * 转移群主
+ */
+export function transferGroupApi(data) {
+  return request.post(GroupApi.transferGroup, {
     data,
   });
 }

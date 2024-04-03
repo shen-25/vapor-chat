@@ -90,22 +90,22 @@ const routes = [
   {
     path: "/group/add",
     name: "addGroup",
-    component: () =>
-      import(/* webpackChunkName: "HomeView" */ "@/views/group/AddGroup.vue"),
+    component: () => import("@/views/group/AddGroup.vue"),
   },
   {
     path: "/group/setting/:id",
     name: "GroupSetting",
-    component: () =>
-      import(
-        /* webpackChunkName: "HomeView" */ "@/views/group/GroupSetting.vue"
-      ),
+    component: () => import("@/views/group/GroupSetting.vue"),
+  },
+  {
+    path: "/group/manager/:id",
+    name: "GroupManager",
+    component: () => import("@/views/group/GroupManager.vue"),
   },
   {
     path: "/group/list",
     name: "GroupList",
-    component: () =>
-      import(/* webpackChunkName: "HomeView" */ "@/views/group/GroupList.vue"),
+    component: () => import("@/views/group/GroupList.vue"),
     children: [
       {
         path: ":id",

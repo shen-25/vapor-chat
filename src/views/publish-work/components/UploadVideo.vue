@@ -16,7 +16,11 @@
         class="video"
         @onClick="hideVideo"
       />
-      <div class="tip" @click="showVideo" v-show="videoUrl !== ''">
+      <div
+        class="tip"
+        @click="showVideo"
+        v-show="videoUrl != '' && videoUrl != null"
+      >
         预览视频
       </div>
     </div>
@@ -34,7 +38,7 @@ export default {
     videoUrl: {
       type: String,
       default() {
-        return null;
+        return "";
       },
     },
   },
@@ -50,6 +54,7 @@ export default {
     function showVideo() {
       show.value = true;
     }
+    console.log(props.videoUrl);
     return { getUploadFile, show, hideVideo, showVideo };
   },
 };

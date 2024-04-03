@@ -71,7 +71,12 @@
             class="cell"
             @click="onGroupNoticeBtn"
           />
-          <van-cell title="群管理" is-link class="cell" />
+          <van-cell
+            title="群管理"
+            is-link
+            class="cell"
+            @click="onShowManagerBtn"
+          />
           <van-cell title="群二维码" is-link class="cell" />
         </div>
         <div class="navigation">
@@ -227,6 +232,9 @@ export default {
         showEditNoticeGroup.value = !showEditNoticeGroup.value;
       }
     }
+    function onShowManagerBtn() {
+      router.push(`/group/manager/${groupInfo.value.groupId}`);
+    }
 
     getGroupInfo();
     return {
@@ -248,6 +256,7 @@ export default {
       editGroupNoticeToggle,
       showEditNoticeGroup,
       onGroupNoticeBtn,
+      onShowManagerBtn,
     };
   },
 };

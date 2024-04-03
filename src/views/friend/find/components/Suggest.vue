@@ -26,7 +26,10 @@ import { computed, nextTick, ref, watch } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
 import { getByNameOrMobileApi } from "@/api/user/user";
 import { addFanApi, deleteFanApi } from "@/api/fan/fan";
+import WebToolkit from "@/im/utils/web-tool-kit";
+import { getClientType } from "@/utils/client-type";
 import { useUserStore } from "@/store/user";
+import { APP_ID } from "@/config/setting";
 export default {
   name: "Suggest",
   props: {
@@ -139,9 +142,13 @@ export default {
     }
 
     function addFan(fromId, toId) {
+      const imei = WebToolkit.getDeviceInfo().system;
       const param = {
         fromId,
         toId,
+        appId: APP_ID,
+        imei,
+        clientType: getClientType(imei),
       };
       const { code, msg, data } = addFanApi(param);
       if (code == 0) {
@@ -150,9 +157,13 @@ export default {
 
     // 删除粉丝
     function deleteFan(fromId, toId) {
+      const imei = WebToolkit.getDeviceInfo().system;
       const param = {
         fromId,
         toId,
+        appId: APP_ID,
+        imei,
+        clientType: getClientType(imei),
       };
       const { code, msg, data } = deleteFanApi(param);
       if (code == 0) {

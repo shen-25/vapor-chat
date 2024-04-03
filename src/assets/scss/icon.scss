@@ -16,11 +16,11 @@
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
   font-family: "chat-icon"; /* Project id 4431305 */
-  src: url("//at.alicdn.com/t/c/font_4431305_b8c7joojbu.woff2?t=1711682883964")
+  src: url("//at.alicdn.com/t/c/font_4431305_cpv2sll8ag.woff2?t=1712067533643")
       format("woff2"),
-    url("//at.alicdn.com/t/c/font_4431305_b8c7joojbu.woff?t=1711682883964")
+    url("//at.alicdn.com/t/c/font_4431305_cpv2sll8ag.woff?t=1712067533643")
       format("woff"),
-    url("//at.alicdn.com/t/c/font_4431305_b8c7joojbu.ttf?t=1711682883964")
+    url("//at.alicdn.com/t/c/font_4431305_cpv2sll8ag.ttf?t=1712067533643")
       format("truetype");
 }
 
@@ -103,4 +103,13 @@
 }
 .icon-add::before {
   content: "\e62e";
+}
+.icon-comment::before {
+  content: "\e636";
+}
+.icon-likes::before {
+  content: "\e7d2";
+}
+.icon-share::before {
+  content: "\e633";
 }

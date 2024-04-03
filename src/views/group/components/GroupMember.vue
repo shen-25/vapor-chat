@@ -3,7 +3,10 @@
     <div class="member-card" v-for="item in data" :key="item.memberId">
       <div class="information">
         <img :src="item.avatar" alt="" />
-        <div class="name">{{ item.nickname }}</div>
+        <div class="name">
+          {{ item.nickname }}
+          <span v-if="item.role != 0">{{ getTag(item.role) }}</span>
+        </div>
       </div>
       <div class="operate">
         <div class="send">私信</div>
@@ -19,6 +22,15 @@ export default {
     data: {
       type: Object,
       default: {},
+    },
+  },
+  methods: {
+    getTag(role) {
+      if (role == 1) {
+        return "管理员";
+      } else if (role == 2) {
+        return "群主";
+      }
     },
   },
 };
@@ -45,6 +57,14 @@ export default {
       .name {
         padding-left: 20rem;
         font-size: 16rem;
+        span {
+          height: 12rem;
+          padding: 2rem 4rem;
+          background-color: #ccc;
+          font-size: 10rem;
+          border-radius: 3rem;
+          color: #7d7d7d;
+        }
       }
     }
     .operate {

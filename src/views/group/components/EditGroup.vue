@@ -65,7 +65,7 @@ import { APP_ID } from "@/config/setting";
 import { mapStores } from "pinia";
 import { useUserStore } from "@/store/user";
 import WebToolkit from "@/im/utils/web-tool-kit";
-import { getClientType } from "@/utils/clien-type";
+import { getClientType } from "@/utils/client-type";
 export default {
   props: {
     data: {

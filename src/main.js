@@ -5,8 +5,8 @@ import router from "./router";
 // 引入全局的样式文件
 import "@/assets/scss/index.scss";
 
+// 2. 引入组件样式
 import "vant/lib/index.css";
-
 import {
   Popup,
   Button,
@@ -22,6 +22,8 @@ import {
   CheckboxGroup,
   Cell,
   Dialog,
+  Switch,
+  TextEllipsis,
 } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
@@ -45,4 +47,7 @@ app.use(Uploader);
 app.use(Popover);
 app.use(Checkbox);
 app.use(CheckboxGroup);
+app.use(Switch);
+app.use(TextEllipsis);
+
 app.use(Button).use(DatePicker).use(Popup).use(Area).mount("#app");

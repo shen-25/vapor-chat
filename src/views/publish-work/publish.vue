@@ -125,7 +125,7 @@ export default {
     const uploadFileList = ref([]);
 
     const isUploadVideo = ref(true);
-    const videoUrl = ref("");
+    const videoUrl = ref(null);
 
     const userStore = useUserStore();
     const locationColumns = [
@@ -170,7 +170,6 @@ export default {
           imageWorkReqList.push(image);
         });
       }
-      debugger;
       const { code, msg, data } = await workPublishApi({
         ...postModel.value,
         imageWorkReqList,
