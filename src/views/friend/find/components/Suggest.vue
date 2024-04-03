@@ -25,7 +25,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
 import { getByNameOrMobileApi } from "@/api/user/user";
-import { addFanApi, deleteFanApi } from "@/api/fan/fan";
+import { addFanApi, deleteFanApi } from "@/api/interact/fan";
 import WebToolkit from "@/im/utils/web-tool-kit";
 import { getClientType } from "@/utils/client-type";
 import { useUserStore } from "@/store/user";

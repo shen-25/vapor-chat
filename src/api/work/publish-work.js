@@ -5,6 +5,7 @@ const WorkPostAPi = {
   discovery: "/work/workPost/discovery",
   getPostDetail: "/work/workPost/getDetail",
   myPost: "/work/workPost/get/me",
+  getVideoWorkDetail: "/work/workPost/video/getDetail",
 };
 
 /**
@@ -38,6 +39,12 @@ export function getWorkPostDetailApi(param) {
  */
 export function getMyWorkListApi(param) {
   return request.get(WorkPostAPi.myPost, {
+    params: param,
+  });
+}
+
+export function getVideoWorkDetailApi(param) {
+  return request.get(WorkPostAPi.getVideoWorkDetail, {
     params: param,
   });
 }

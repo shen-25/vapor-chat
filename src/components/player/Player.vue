@@ -1,5 +1,5 @@
 <template>
-  <div id="video-player"></div>
+  <div :id="playerId" class="video-player"></div>
 </template>
 <script>
 import { onMounted, watch, ref, onUnmounted } from "vue";
@@ -37,6 +37,8 @@ export default {
   emits: ["triggerEvent", "onClick"],
   setup(props, { emit }) {
     const player = ref(null);
+    const playerId = ref("");
+    playerId.value = getRandomStr(15);
     onMounted(() => {
       if (!props.videoUrl) {
         return;
@@ -49,10 +51,21 @@ export default {
         player.value = null;
       }
     });
-
+    function getRandomStr(length) {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      const charactersLength = characters.length;
+      let result = "";
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    }
     function initPlayer() {
       const config = {
-        id: "video-player",
+        id: playerId.value,
         url: props.videoUrl,
         height: props.height,
         width: props.width,
@@ -118,6 +131,7 @@ export default {
     );
     return {
       player,
+      playerId,
     };
   },
 };

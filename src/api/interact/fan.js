@@ -1,8 +1,8 @@
 import { request } from "@/utils/request";
 
 const FanApi = {
-  addFan: "/user/fan/add",
-  deleteFan: "/user/fan/delete",
+  addFan: "/interact/fan/add",
+  deleteFan: "/interact/fan/delete",
 };
 
 /**
