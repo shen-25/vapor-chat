@@ -13,7 +13,6 @@ export default {
     modelValue: String,
     placeholder: {
       type: String,
-      default: "昵称/手机号",
     },
   },
 
@@ -31,7 +30,7 @@ export default {
   created() {
     this.$watch(
       "query",
-      debounce(900, (newQuery) => {
+      debounce(40, (newQuery) => {
         this.$emit("update:modelValue", newQuery.trim());
       })
     );

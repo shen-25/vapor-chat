@@ -102,7 +102,7 @@ export default {
 
     function selectWork(work) {
       if (work.type == 0) {
-        router.push(`/recommend/video/${work.postId}`);
+        router.push(`/video/${work.postId}`);
       } else if (work.type === 1) {
         router.push(`/recommend/${work.postId}`);
       }

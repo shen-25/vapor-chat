@@ -8,6 +8,7 @@ const GroupApi = {
   deleteGroup: "/v1/group/delete",
 
   transferGroup: "/v1/group/transfer",
+  searchGroup: "/v1/group/search",
 };
 
 /**
@@ -55,4 +56,10 @@ export function transferGroupApi(data) {
   return request.post(GroupApi.transferGroup, {
     data,
   });
+}
+/**
+ * 搜索群聊
+ */
+export function searchGroupApi(param) {
+  return request.get(GroupApi.searchGroup, { params: param });
 }

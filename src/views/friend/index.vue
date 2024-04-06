@@ -3,18 +3,27 @@
     <div class="header">
       <div class="text">通讯录</div>
       <div class="icon">
-        <div class="search">
-          <i class="icon-back"></i>
-        </div>
+        <div class="search"></div>
         <div class="add">
-          <i class="icon-location"></i>
+          <div class="popover">
+            <van-popover
+              v-model:show="showPopover"
+              :actions="actions"
+              @select="onAddSelect"
+              placement="bottom-end"
+            >
+              <template #reference>
+                <i class="icon-add"></i>
+              </template>
+            </van-popover>
+          </div>
         </div>
       </div>
     </div>
     <div class="content">
       <div class="item">
         <img class="avatar" src="../../assets/images/群聊.jpg" />
-        <span class="name">新的朋友</span>
+        <span class="name">群通知</span>
       </div>
       <div class="item" @click="onGroupDiv">
         <img class="avatar" src="../../assets/images/群聊.jpg" />
@@ -79,7 +88,31 @@ export default {
     }
     getAllFriendshipNamePinyin();
 
-    return { friendListAndPinyin, totalFriends, onGroupDiv, selectFriend };
+    const showPopover = ref(false);
+
+    // 通过 actions 属性来定义菜单选项
+
+    const actions = [
+      { text: "发起群聊", icon: "chat-o" },
+      { text: "加好友/群", icon: "add-o" },
+    ];
+    function onAddSelect(action) {
+      if (action.text == "发起群聊") {
+        router.push("/group/add");
+      } else {
+        router.push("/friend/find");
+      }
+    }
+
+    return {
+      friendListAndPinyin,
+      totalFriends,
+      onGroupDiv,
+      selectFriend,
+      actions,
+      onAddSelect,
+      showPopover,
+    };
   },
 };
 </script>
@@ -96,7 +129,7 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    height: 60rem;
+    height: 50rem;
     padding: 0rem 18rem;
     background: #fff;
     z-index: 4000;
@@ -116,7 +149,7 @@ export default {
       .icon-back {
         font-size: 24rem;
       }
-      .icon-location {
+      .icon-add {
         font-size: 24rem;
         margin-left: 18rem;
       }

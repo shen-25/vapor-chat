@@ -12,17 +12,8 @@
       </transition>
 
       <div class="right">
-        <div class="item" :style="floatStyle">
-          <i class="icon-nav"></i>
-        </div>
-        <div class="item" :style="floatStyle">
-          <i class="icon-nav"></i>
-        </div>
         <div class="item">
-          <i class="icon-nav"></i>
-        </div>
-        <div class="item">
-          <i class="icon-nav"></i>
+          <i class="icon-share"></i>
         </div>
       </div>
     </div>
@@ -42,12 +33,7 @@
               <div class="right">
                 <p class="name">{{ userInfo.nickname }}</p>
                 <div class="number mb1r">
-                  <span class="mr1r">私密账号</span>
                   <span>短号: {{ userInfo.shortname }}</span>
-                  <img
-                    src="../../assets/images/icon/me/qrcode-gray.png"
-                    alt=""
-                  />
                 </div>
               </div>
             </div>
@@ -56,23 +42,23 @@
             <div class="head">
               <div class="heat">
                 <div class="text">
-                  <span class="num">100万</span>
+                  <span class="num">{{ uerStatistics.likeCount }}</span>
                   <span>获赞</span>
                 </div>
                 <div class="text">
-                  <span class="num">100</span>
+                  <span class="num">{{ uerStatistics.friendCount }}</span>
                   <span>朋友</span>
                 </div>
                 <div class="text">
-                  <span class="num">100</span>
+                  <span class="num">{{ uerStatistics.followCount }}</span>
                   <span>关注</span>
                 </div>
                 <div class="text">
-                  <span class="num">1000</span>
+                  <span class="num">{{ uerStatistics.fanCount }}</span>
                   <span>粉丝</span>
                 </div>
               </div>
-              <div class="button">添加朋友</div>
+              <div class="button" @click="toSearch">添加朋友</div>
             </div>
             <div class="signature">
               <template v-if="true">
@@ -158,6 +144,7 @@ import {
   getWorkCollectPageListApi,
   getWorkLikedPageListApi,
 } from "@/api/work/publish-work";
+import { getUerStatisticsApi } from "@/api/interact/fan";
 export default {
   name: "Me",
   components: {
@@ -340,7 +327,7 @@ export default {
 
     function selectWork(work) {
       if (work.type == 0) {
-        router.push(`/recommend/video/${work.postId}`);
+        router.push(`/video/${work.postId}`);
       } else if (work.type === 1) {
         router.push(`/recommend/${work.postId}`);
       }
@@ -360,11 +347,26 @@ export default {
         return "点击添加介绍，让大家认识你...";
       }
     }
+    const uerStatistics = ref({});
+
+    async function getUerStatistics() {
+      const param = {
+        userId: userStore.getUserId(),
+      };
+      const { msg, code, data } = await getUerStatisticsApi(param);
+      if (code == 0) {
+        uerStatistics.value = data;
+      }
+    }
 
     const likeWorkPostList = ref([]);
     searchFirst();
-
+    getUerStatistics();
     getUserInfo();
+
+    function toSearch() {
+      router.push("/friend/find");
+    }
 
     return {
       slideRowListStyle,
@@ -384,6 +386,8 @@ export default {
       myWorkPostList,
       likeWorkPostList,
       getSignature,
+      uerStatistics,
+      toSearch,
     };
   },
 };
@@ -460,9 +464,9 @@ export default {
       background: rgba(82, 80, 80, 0.5);
       border-radius: 50%;
       margin-left: 10rem;
-      .icon-nav {
+      .icon-share {
         color: white;
-        font-size: 18rem;
+        font-size: 20rem;
       }
     }
   }

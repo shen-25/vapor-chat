@@ -4,7 +4,6 @@ import MessageChat from "@/views/message/chat/index.vue";
 import ExploreWork from "@/views/explore-work/index.vue";
 import FriendDetail from "@/views/friend/index-list/index.vue";
 import GroupDetail from "@/views/group/GroupDetail.vue";
-import ExploreWorkVideo from "@/views/video-work/index.vue";
 const routes = [
   {
     path: "/",
@@ -48,12 +47,14 @@ const routes = [
         path: ":id",
         component: ExploreWork,
       },
-      {
-        path: "video/:id",
-        component: ExploreWorkVideo,
-      },
     ],
   },
+  {
+    path: "/video/:id",
+    name: "VideoWork",
+    component: () => import("@/views/video-work/index.vue"),
+  },
+
   {
     path: "/publishWork",
     name: "publishWork",

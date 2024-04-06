@@ -47,6 +47,11 @@
         @close="onGroupMemberListClose"
         :groupId="groupId"
       />
+      <GroupAdmin
+        v-if="showGroupAdmin"
+        :data="groupMemberList"
+        :groupId="groupId"
+      />
     </div>
   </div>
 </template>
@@ -66,10 +71,10 @@ import { getClientType } from "@/utils/client-type";
 import { cloneDeep } from "lodash-es";
 import GroupMemberList from "./components/GroupMemberList";
 import { useRouter } from "vue-router";
-
+import GroupAdmin from "./components/GroupAdmin.vue";
 export default {
   name: "GroupManger",
-  components: { GroupMemberList },
+  components: { GroupMemberList, GroupAdmin },
   setup(props, { emit }) {
     const router = useRouter();
     const showGroupMemberList = ref(false);
@@ -153,13 +158,13 @@ export default {
       groupMangerType.value = 1;
       showGroupMemberList.value = true;
     }
+
+    const showGroupAdmin = ref(false);
     /**
      * 设置管理员
      */
     function onSetMangerBtn() {
-      groupMangerType.value = 2;
-
-      showGroupMemberList.value = true;
+      showGroupAdmin.value = true;
     }
     /**
      * 移除群成员
@@ -200,6 +205,7 @@ export default {
       onTransferBtn,
       onSetMangerBtn,
       onGroupMemberListClose,
+      showGroupAdmin,
     };
   },
 };

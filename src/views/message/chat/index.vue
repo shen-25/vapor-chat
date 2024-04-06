@@ -27,8 +27,24 @@
         <input class="input-inner" v-model="messageText" />
       </div>
       <div class="notice">
-        <div class="text" @click="onSendMessage(MESSAGE_TYPE.TEXT)">发送</div>
+        <div
+          class="text"
+          @click="onSendMessage(MESSAGE_TYPE.TEXT)"
+          v-if="isTextInput"
+        >
+          发送
+        </div>
+        <FileUploader @completeOneFile="getUploadFile" class="file-uploader">
+          <template v-slot:center>
+            <i class="icon-add" v-if="!isTextInput" @click="clickSendOther"></i>
+          </template>
+        </FileUploader>
       </div>
+      <van-share-sheet
+        v-model:show="showSendOther"
+        :options="sendOtherOptions"
+        @select="onSendOtherSelect"
+      />
     </div>
   </div>
 </template>
@@ -39,12 +55,14 @@ import Back from "@/components/base/back/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import ChatMessage from "./ChatMessage.vue";
-import { ref, inject, onMounted, computed } from "vue";
+import { ref, inject, onMounted, computed, watch } from "vue";
 import WebToolkit from "@/im/utils/web-tool-kit";
 import { MESSAGE_TYPE } from "./use-chat.js";
 import { getP2PMessageApi } from "@/api/message/message";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
+import FileUploader from "@/components/file-uploader";
+
 export default {
   name: "chat",
 
@@ -52,6 +70,7 @@ export default {
     BaseHeader,
     Back,
     ChatMessage,
+    FileUploader,
     Scroll,
   },
   setup(props, { emit }) {
@@ -62,8 +81,20 @@ export default {
     const imSdk = inject("$imSdk");
 
     const messageText = ref("");
+    const imageUrl = ref("");
 
     const messageList = ref([]);
+
+    const isTextInput = ref(false);
+
+    watch(messageText, (newText) => {
+      console.log(newText);
+      if (newText && newText != "") {
+        isTextInput.value = true;
+      } else {
+        isTextInput.value = false;
+      }
+    });
 
     imSdk.listeners.onP2PMessage = async (pack) => {
       await onListenMessage(JSON.parse(pack));
@@ -77,16 +108,24 @@ export default {
       };
       const { msg, code, data } = await getP2PMessageApi(param);
       if (code === 0) {
-        messageList.value = data;
+        data.forEach((element) => {
+          if (element.type == MESSAGE_TYPE.SharePost) {
+            let temp = element;
+            temp.data = JSON.parse(element.data);
+            messageList.value.push(temp);
+          } else {
+            messageList.value.push(element);
+          }
+        });
       }
     }
 
     async function onSendMessage(msgType) {
-      if (messageText.value == "" || messageText.value == undefined) {
-        return;
-      }
       // 发送文本消息
       if (msgType === MESSAGE_TYPE.TEXT) {
+        if (messageText.value == "" || messageText.value == undefined) {
+          return;
+        }
         const friendId = router.currentRoute.value.params.id;
         const msg = {
           type: MESSAGE_TYPE.TEXT,
@@ -108,6 +147,67 @@ export default {
         );
         messageText.value = "";
       }
+      // 发送帖子分享
+      if (msgType == MESSAGE_TYPE.SharePost) {
+        const toId = router.currentRoute.value.params.id;
+        const postWork = {
+          postId: "1775150487142928384",
+          title: "美丽的大自然",
+          coverUrl:
+            "http://zengshen.org:9000/easy-cloud-disk/2024-04-02/dcdbc14abc984998b5ac4c6a2f6658ef.jpg",
+          type: 0,
+          userId: "1",
+          nickname: "你好吗",
+          avatar:
+            "http://zengshen.org:9000/easy-cloud-disk/2024-03-28/a2f8bf500eb1400a9e1d8f4e08988dc5.ico",
+        };
+        const msg = {
+          type: MESSAGE_TYPE.SharePost,
+          data: postWork,
+          time: new Date(),
+          user: {
+            userId: userStore.getUserId(),
+            avatar: userStore.getAvatar(),
+          },
+        };
+        messageList.value.push(msg);
+        // 构造数据格式
+        imSdk.sendP2PMessage(
+          imSdk.createSharePostMessage(
+            userStore.getAvatar(),
+            toId,
+            MESSAGE_TYPE.SharePost,
+            postWork
+          )
+        );
+      }
+      // 发送图片分享
+      if (msgType == MESSAGE_TYPE.Image) {
+        if (!imageUrl.value) {
+          return;
+        }
+        const toId = router.currentRoute.value.params.id;
+        const msg = {
+          type: MESSAGE_TYPE.Image,
+          data: imageUrl.value,
+          time: new Date(),
+          user: {
+            userId: userStore.getUserId(),
+            avatar: userStore.getAvatar(),
+          },
+        };
+        messageList.value.push(msg);
+        // 构造数据格式
+        imSdk.sendP2PMessage(
+          imSdk.createImageMessage(
+            userStore.getAvatar(),
+            toId,
+            MESSAGE_TYPE.Image,
+            imageUrl.value
+          )
+        );
+        imageUrl.value = "";
+      }
     }
 
     async function onListenMessage(msgPack) {
@@ -119,6 +219,32 @@ export default {
         const msg = {
           data: messageBody.content,
           type: MESSAGE_TYPE.TEXT,
+          createTime: data.messageTime,
+          user: {
+            userId: data.fromId,
+            avatar: data.avatar,
+          },
+        };
+        messageList.value.push(msg);
+      } // 发送帖子分享
+      if (messageBody.type == MESSAGE_TYPE.SharePost) {
+        console.log(typeof messageBody.content);
+        const msg = {
+          type: MESSAGE_TYPE.SharePost,
+          data: messageBody.content,
+          createTime: data.messageTime,
+          user: {
+            userId: data.fromId,
+            avatar: data.avatar,
+          },
+        };
+        messageList.value.push(msg);
+      }
+      // 发送图片分享
+      if (messageBody.type == MESSAGE_TYPE.Image) {
+        const msg = {
+          type: MESSAGE_TYPE.Image,
+          data: messageBody.content,
           createTime: data.messageTime,
           user: {
             userId: data.fromId,
@@ -146,6 +272,20 @@ export default {
       }
     }
 
+    const showSendOther = ref(false);
+    const sendOtherOptions = [{ name: "相册", icon: "poster" }];
+
+    const onSendOtherSelect = () => {
+      showSendOther.value = false;
+    };
+    function clickSendOther() {
+      // showSendOther.value = true;
+    }
+    function getUploadFile(fileUrl) {
+      imageUrl.value = fileUrl;
+      onSendMessage(MESSAGE_TYPE.Image);
+    }
+
     getP2PMessageData();
     return {
       MESSAGE_TYPE,
@@ -154,11 +294,20 @@ export default {
       messageText,
       onSendMessage,
       getChatCls,
+      isTextInput,
+      sendOtherOptions,
+      showSendOther,
+      onSendOtherSelect,
+      clickSendOther,
+      getUploadFile,
     };
   },
 };
 </script>
 <style lang="scss" scoped>
+.file-uploader {
+  width: 40rem;
+}
 .chat-container {
   position: fixed;
   z-index: 1000;
@@ -243,10 +392,11 @@ export default {
       }
     }
     .notice {
-      width: 90rem;
       display: flex;
       align-items: center;
       .text {
+        width: 90rem;
+
         height: 30rem;
         line-height: 30rem;
         width: 60rem;
@@ -255,6 +405,10 @@ export default {
         background: #95ec69;
         font-size: 16rem;
         border-radius: 6rem;
+      }
+      .icon-add {
+        width: 50rem;
+        font-size: 30rem;
       }
     }
   }

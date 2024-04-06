@@ -15,11 +15,20 @@
       <div class="right"></div>
     </div>
     <div class="search-input-wrapper">
-      <SearchInput v-model="query"></SearchInput>
+      <SearchInput v-model="query" :placeholder="placeholder"></SearchInput>
     </div>
     <div class="search-result" v-show="query">
       <Suggest
         :query="query"
+        :searchType="searchType"
+        v-if="searchType == 1"
+        @selectSong="selectSong"
+        @selectSinger="selectSinger"
+      />
+      <SuggestGroup
+        :query="query"
+        v-if="searchType == 2"
+        :searchType="searchType"
         @selectSong="selectSong"
         @selectSinger="selectSinger"
       />
@@ -31,13 +40,24 @@
 import { computed, ref } from "vue";
 import SearchInput from "./components/SearchInput.vue";
 import Suggest from "./components/Suggest.vue";
+import SuggestGroup from "./components/SuggestGroup.vue";
+
 import { useRouter } from "vue-router";
 export default {
-  components: { SearchInput, Suggest },
+  components: { SearchInput, Suggest, SuggestGroup },
   setup() {
     const router = useRouter();
     const showFindStyle = ref(false);
+    const placeholder = ref("昵称/手机号");
+    const searchType = ref(1);
     function onFindBtn(val) {
+      if (val == 1) {
+        placeholder.value = "昵称/手机号";
+      } else {
+        placeholder.value = "搜索群号/群名称";
+      }
+      query.value = "";
+      searchType.value = val;
       showFindStyle.value = !showFindStyle.value;
     }
     function getFindCls(val) {
@@ -70,6 +90,8 @@ export default {
       goBack,
       // 搜索
       query,
+      placeholder,
+      searchType,
     };
   },
 };

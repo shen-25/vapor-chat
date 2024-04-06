@@ -16,6 +16,18 @@
         <div class="chat-text" v-if="message.type === MESSAGE_TYPE.TEXT">
           {{ message.data }}
         </div>
+        <div class="chat-image" v-if="message.type === MESSAGE_TYPE.Image">
+          <img :src="message.data" alt="" />
+        </div>
+        <div
+          class="chat-preview"
+          v-if="message.type === MESSAGE_TYPE.SharePost"
+        >
+          <ChatPreview
+            :postWork="message.data"
+            @select="selectWork"
+          ></ChatPreview>
+        </div>
       </div>
       <img v-if="isMe" :src="message.user.avatar" alt="" class="avatar" />
     </template>
@@ -25,9 +37,10 @@
 import { MESSAGE_TYPE, CALL_STATE } from "./use-chat.js";
 import { useUserStore } from "@/store/user";
 import { mapStores } from "pinia";
-
+import ChatPreview from "@/components/preview/chat-preview.vue";
 export default {
   name: "ChatMessage",
+  components: { ChatPreview },
   props: {
     message: {
       type: Object,
@@ -49,7 +62,15 @@ export default {
     ...mapStores(useUserStore),
   },
   created() {},
-  methods: {},
+  methods: {
+    selectWork(work) {
+      if (work.type == 0) {
+        this.$router.push(`/video/${work.postId}`);
+      } else if (work.type === 1) {
+        this.$router.push(`/recommend/${work.postId}`);
+      }
+    },
+  },
 };
 </script>
 
@@ -129,6 +150,20 @@ export default {
       align-items: center;
       font-size: 14rem;
       border-radius: 10rem;
+    }
+    .chat-image {
+      max-width: 46vw;
+      padding: 10rem;
+      height: 20vh;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .chat-preview {
+      width: 40vw;
+      padding: 10rem;
     }
 
     .loves {

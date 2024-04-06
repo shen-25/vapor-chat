@@ -16,4 +16,10 @@ export const CALL_STATE = {
 export const MESSAGE_TYPE = {
   // 文本
   TEXT: 1,
+  // 图片
+  Image: 2,
+  // 分享视频图文相关
+  SharePost: 3,
+  //分享个人资料
+  SharePerson: 4,
 };

@@ -25,6 +25,7 @@
 
 <script>
 import Like from "@/components/like/index.vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 export default {
   name: "preView",
   components: {
@@ -41,6 +42,7 @@ export default {
     function onItemClick(work) {
       emit("select", work);
     }
+
     return {
       onItemClick,
     };

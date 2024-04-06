@@ -267,6 +267,30 @@ export default class UseImClient {
     return messagePack;
   }
 
+  //构建分享消息对象
+  createSharePostMessage(fromAvatar, toId, type, sharePost) {
+    let messagePack = new MessagePack(this.appId);
+    messagePack.buildCustomerMessagePack(
+      this.userId,
+      fromAvatar,
+      toId,
+      type,
+      sharePost
+    );
+    return messagePack;
+  }
+  //构建分享消息对象
+  createImageMessage(fromAvatar, toId, type, imageUrl) {
+    let messagePack = new MessagePack(this.appId);
+    messagePack.buildCustomerMessagePack(
+      this.userId,
+      fromAvatar,
+      toId,
+      type,
+      imageUrl
+    );
+    return messagePack;
+  }
   sendP2PMessage(pack) {
     let p2pPack = useImClient.buildMessagePack(MessageCommand.MSG_P2P, pack);
     if (this.connect) {

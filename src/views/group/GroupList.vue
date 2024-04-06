@@ -5,9 +5,7 @@
         <i class="icon-back"></i>
       </div>
       <div class="middle">群聊</div>
-      <div class="right">
-        <i class="icon-tip"></i>
-      </div>
+      <div class="right"></div>
     </div>
     <div class="groupList">
       <Scroll class="groupList-content">

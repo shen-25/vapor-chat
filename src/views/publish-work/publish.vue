@@ -74,8 +74,8 @@
     </Scroll>
     <div class="footer">
       <div class="draft">
-        <i class="icon-draft"></i>
-        <div class="text">存草稿</div>
+        <!-- <i class="icon-draft"></i>
+        <div class="text">存草稿</div> -->
       </div>
       <div class="post" @click="onSubmit">
         <div class="text">发布笔记</div>

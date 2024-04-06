@@ -1,6 +1,10 @@
 <template>
   <div class="explore-container">
-    <Header :headerData="headerData"></Header>
+    <Header
+      :headerData="headerData"
+      :workDetail="workDetail"
+      v-if="headerData"
+    ></Header>
     <div class="scroll-wrapper" @click="hideCommentDiv">
       <Scroll class="explore-content">
         <div>
@@ -20,12 +24,12 @@
           </div>
           <div class="comment-content">
             <div class="total">共100条评论</div>
-            <div
-              class="list-container"
-              v-for="item in commentList"
-              :key="item.commentId"
-            >
-              <Comment :data="item"></Comment>
+            <div @click.stop>
+              <Comment
+                :commentList="commentList"
+                @onComment="onComment"
+                :authorUserId="authorUserId"
+              ></Comment>
             </div>
           </div>
         </div>
@@ -46,15 +50,15 @@
       <div class="interact-container">
         <div class="item">
           <i class="icon-like"></i>
-          <span>2213</span>
+          <span>{{ workDetail?.statistics?.likeCount }}</span>
         </div>
         <div class="item">
-          <i class="icon-like"></i>
-          <span>2213</span>
+          <i class="icon-collect-blank"></i>
+          <span>{{ workDetail?.statistics?.collectCount }}</span>
         </div>
         <div class="item">
-          <i class="icon-like"></i>
-          <span>2213</span>
+          <i class="icon-video-comment"></i>
+          <span>{{ workDetail?.statistics?.commentCount }}</span>
         </div>
       </div>
     </div>
@@ -84,6 +88,8 @@ import { useRouter } from "vue-router";
 import Comment from "./components/Comment.vue";
 import { addCommentApi, getCommentListApi } from "@/api/comment/index";
 import { useUserStore } from "@/store/user";
+import { addCollectApi, deleteCollectApi } from "@/api/interact/collect";
+import { addLikeApi, deleteLikeApi } from "@/api/interact/like";
 export default {
   name: "explore",
   components: { Header, Slider, Scroll, Comment },
@@ -92,17 +98,19 @@ export default {
     const userStore = useUserStore();
     const sliders = ref([]);
     const workDetail = ref({});
-    const headerData = ref({});
+    const headerData = ref(null);
     const commentList = ref([]);
     const showInputDiv = ref(false);
     const showLine = ref(false);
 
-    const inputFocus = ref(false);
-
-    const inputPRef = ref(null);
+    const authorUserId = ref("");
 
     async function getWorkPostDetail(postId) {
-      const { msg, data, code } = await getWorkPostDetailApi({ postId });
+      const userId = userStore.getUserId();
+      const { msg, data, code } = await getWorkPostDetailApi({
+        postId,
+        userId,
+      });
       if (code == 0) {
         workDetail.value = data;
         sliders.value = workDetail.value.imagePostList;
@@ -111,6 +119,7 @@ export default {
           avatar: data.avatar,
           nickname: data.nickname,
         };
+        authorUserId.value = data.userId;
       }
     }
     async function getCommentList() {
@@ -128,14 +137,13 @@ export default {
       }
     }
 
-    async function addComment(content, type, parentId, replyId) {
+    async function addComment(content, type, parentId) {
       const param = {
         userId: userStore.getUserId(),
         postId: workDetail.value.postId,
         content,
         type,
         parentId,
-        replyId,
       };
       const { msg, data, code } = await addCommentApi(param);
       if (code == 0) {
@@ -147,19 +155,80 @@ export default {
       }
     }
 
+    const replyCommentModel = ref();
+
     async function toInput() {
+      replyCommentModel.value = {
+        commentId: "",
+        userId: "",
+        nickname: "",
+      };
       showInputDiv.value = true;
-      inputFocus.value = true;
     }
     async function onSendBtn() {
       const p = document.getElementById("content-textarea");
-      addComment(p.innerText, 0, null, null);
+
+      if (replyCommentModel.value.commentId) {
+        addComment(p.innerText, 0, replyCommentModel.value.commentId);
+      } else {
+        addComment(p.innerText, 0, null);
+      }
     }
 
     function hideCommentDiv() {
       showInputDiv.value = false;
     }
+
+    async function onComment(commentId, userId, nickname) {
+      replyCommentModel.value = {
+        commentId,
+        userId,
+        nickname,
+      };
+      showInputDiv.value = !showInputDiv.value;
+    }
     getWorkPostDetail(router.currentRoute.value.params.id);
+
+    async function addCollect() {
+      const param = {
+        postId: workDetail.value.postId,
+        userId: userStore.getUserId(),
+      };
+      const { msg, data, code } = await addCollectApi(param);
+      if (code == 0) {
+        workDetail.value.isCollect = !workDetail.value.isCollect;
+      }
+    }
+    async function addWorkLike() {
+      const param = {
+        postId: workDetail.value.postId,
+        userId: userStore.getUserId(),
+      };
+      const { msg, data, code } = await addLikeApi(param);
+      if (code == 0) {
+        workDetail.value.isLike = !workDetail.value.isLike;
+      }
+    }
+    async function deleteCollect() {
+      const param = {
+        postId: workDetail.value.postId,
+        userId: userStore.getUserId(),
+      };
+      const { msg, data, code } = await deleteCollectApi(param);
+      if (code == 0) {
+        workDetail.value.isCollect = !workDetail.value.isCollect;
+      }
+    }
+    async function deleteWorkLike() {
+      const param = {
+        postId: workDetail.value.postId,
+        userId: userStore.getUserId(),
+      };
+      const { msg, data, code } = await deleteLikeApi(param);
+      if (code == 0) {
+        workDetail.value.isLike = !workDetail.value.isLike;
+      }
+    }
 
     getCommentList();
     onMounted(() => {});
@@ -173,13 +242,17 @@ export default {
       toInput,
       showLine,
       hideCommentDiv,
-      inputPRef,
       commentList,
+      onComment,
+      authorUserId,
     };
   },
 };
 </script>
 <style lang="scss" scoped>
+.red-class {
+  color: red;
+}
 .explore-container {
   position: fixed;
   top: 0;
@@ -273,7 +346,15 @@ export default {
         text-align: center;
         padding-left: 10rem;
         .icon-like {
-          font-size: 24rem;
+          font-size: 23rem;
+          margin-right: 4rem;
+        }
+        .icon-video-comment {
+          font-size: 19rem;
+          margin-right: 4rem;
+        }
+        .icon-collect-blank {
+          font-size: 26rem;
           margin-right: 4rem;
         }
       }

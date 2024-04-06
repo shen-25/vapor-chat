@@ -31,9 +31,10 @@ export class MessagePack {
     this.messageBody = ObjUtil.json(body);
   }
 
-  buildCustomerMessagePack(fromId, toId, type, obj) {
+  buildCustomerMessagePack(fromId, avatar, toId, type, obj) {
     this.fromId = fromId;
     this.toId = toId;
+    this.avatar = avatar;
     let body = { type: type, content: obj };
     this.messageBody = ObjUtil.json(body);
   }

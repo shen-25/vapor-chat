@@ -34,9 +34,18 @@
           <div class="item">
             <div class="content">
               <div class="icon">
-                <i class="icon-shengluehao"></i>
+                <i class="icon-add"></i>
               </div>
               <div class="text">邀请朋友</div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="content">
+              <div class="icon">
+                <i class="icon-share"></i>
+              </div>
+              <div class="text">分享群聊</div>
             </div>
           </div>
           <div class="item">
@@ -44,23 +53,7 @@
               <div class="icon">
                 <i class="icon-shengluehao"></i>
               </div>
-              <div class="text">邀请朋友</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="content">
-              <div class="icon">
-                <i class="icon-shengluehao"></i>
-              </div>
-              <div class="text">邀请朋友</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="content">
-              <div class="icon">
-                <i class="icon-shengluehao"></i>
-              </div>
-              <div class="text">邀请朋友</div>
+              <div class="text">设置群昵称</div>
             </div>
           </div>
         </div>
@@ -77,7 +70,6 @@
             class="cell"
             @click="onShowManagerBtn"
           />
-          <van-cell title="群二维码" is-link class="cell" />
         </div>
         <div class="navigation">
           <Indicator
@@ -369,6 +361,12 @@ export default {
           .icon-shengluehao {
             font-size: 20rem;
           }
+          .icon-share {
+            font-size: 21rem;
+          }
+          .icon-add {
+            font-size: 21rem;
+          }
         }
         .text {
           font-size: 13rem;
@@ -379,7 +377,7 @@ export default {
   .management {
     display: flex;
     flex-direction: column;
-    height: 150rem;
+    height: 100rem;
     margin: 8rem 12rem;
     background: #fff;
     border-radius: 10rem;

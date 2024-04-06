@@ -19,21 +19,6 @@
     <div class="message-container">
       <Scroll class="message-content">
         <div>
-          <Scroll :scrollX="true" :scrollY="false" class="friend-wrapper"
-            ><div class="friend-container">
-              <div
-                class="friend-item"
-                v-for="(item, index) in conversationList"
-                :key="index"
-                @click="onChat(item.toId, item.type)"
-              >
-                <div class="avatar" :class="index % 2 === 0 ? 'on-line' : ''">
-                  <img :src="item.avatar" alt="" class="friend-avatar" />
-                </div>
-                <span>{{ item.name }}</span>
-              </div>
-            </div></Scroll
-          >
           <div class="notice-wrapper">
             <div
               class="notice"

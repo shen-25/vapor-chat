@@ -1,43 +1,71 @@
 <template>
-  <div class="list-container">
+  <div class="list-container" v-for="item of commentList" :key="item.commentId">
     <div class="parent-comment">
       <div class="comment-item">
         <div class="comment-inner-container">
           <div class="avatar">
-            <a href=""><img :src="data.userInfo.avatar" /></a>
+            <a href=""><img :src="item.userInfo.avatar" /></a>
           </div>
-          <div class="right">
+          <div class="right" @click="onCommentBtn(item)">
             <div class="author-wrapper">
               <div class="author">
-                <a href="" class="name">{{ data.userInfo.nickname }}</a>
-                <span class="tag">作者</span>
+                <a class="name">{{ item.userInfo.nickname }}</a>
+                <span class="tag" v-if="isAuthor(item.userInfo.userId)"
+                  >作者</span
+                >
               </div>
             </div>
-            <div class="content">{{ data.content }}</div>
-            <div class="labels">
-              <span class="top">置顶评论</span>
-            </div>
+            <div class="content">{{ item.content }}</div>
+            <div class="labels"></div>
             <div class="info">
-              <span>{{ data.createTime }}</span>
-              <div class="introductions">
-                <div class="like">44</div>
-                <div class="reply">22</div>
-              </div>
+              <span>{{ item.createTime }}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="reply-container"></div>
+      <template v-if="hasChildren(item.children)">
+        <div class="reply-container">
+          <Comment :commentList="item.children" :authorUserId="authorUserId" />
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
+import { useUserStore } from "@/store/user";
 export default {
+  name: "Comment",
   props: {
-    data: {
-      type: Object,
+    commentList: {
+      type: Array,
     },
+    authorUserId: {
+      type: String,
+    },
+  },
+  emits: ["onComment"],
+  setup(props, { emit }) {
+    const userStore = useUserStore();
+    function onCommentBtn(item) {
+      emit(
+        "onComment",
+        item.commentId,
+        item.userInfo.userId,
+        item.userInfo.nickname
+      );
+    }
+    function hasChildren(children) {
+      return children != null && children.length > 0;
+    }
+    function isAuthor(userId) {
+      return userId == props.authorUserId;
+    }
+    return {
+      onCommentBtn,
+      hasChildren,
+      isAuthor,
+    };
   },
 };
 </script>

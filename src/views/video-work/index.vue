@@ -1,11 +1,6 @@
 <template>
   <div class="video-work-container">
-    <div class="header">
-      <div class="left" @click="goBack">
-        <i class="icon-back"></i>
-      </div>
-    </div>
-
+    <Header :videoWorkVO="videoWorkVO" v-if="videoWorkVO"></Header>
     <div class="slide-vertical-wrapper" ref="rootRef">
       <div class="slide-vertical-content">
         <div class="slide-page">
@@ -13,7 +8,7 @@
           <div class="footer">
             <div class="author">@{{ author.nickname }}</div>
             <div class="title">
-              <span>{{ videoWorkVO.title }}</span>
+              <span>{{ videoWorkVO?.title }}</span>
             </div>
           </div>
           <div class="toolbar">
@@ -23,60 +18,7 @@
                 <i
                   class="icon-video-add"
                   @click="onAddFanBtn"
-                  v-if="!audience.isFan"
-                ></i>
-              </div>
-            </div>
-            <div class="item" @click="onLikeBtn">
-              <div class="like">
-                <i
-                  class="icon-video-like"
-                  :class="audience.isLike ? 'click-icon-red' : ''"
-                ></i>
-                <span>{{ statistics.likeCount }}</span>
-              </div>
-            </div>
-            <div class="item" @click="onCommentBtn">
-              <div class="comment">
-                <i class="icon-video-comment"></i>
-                <span>{{ statistics.commentCount }}</span>
-              </div>
-            </div>
-            <div class="item" @click="onCollectBtn">
-              <div class="collect">
-                <i
-                  class="icon-video-collect"
-                  :class="audience.isCollect ? 'click-icon-red' : ''"
-                ></i>
-                <span>{{ statistics.collectCount }}</span>
-              </div>
-            </div>
-            <div class="item" @click="onShareBtn">
-              <div class="share">
-                <i class="icon-video-share"></i>
-                <span>{{ statistics.shareCount }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="slide-page">
-          <div class="videoPlayer">
-            <Player class="video" :videoUrl="tempUrl" />
-          </div>
-          <div class="footer">
-            <div class="author">@{{ author.nickname }}</div>
-            <div class="title">
-              <span>{{ videoWorkVO.title }}</span>
-            </div>
-          </div>
-          <div class="toolbar">
-            <div class="item">
-              <div class="avatar" @click="onAvatarBtn">
-                <img :src="author.avatar" alt="" />
-                <i
-                  class="icon-video-add"
-                  @click="onAddFanBtn"
-                  v-if="!audience.isFan"
+                  v-if="showAddFanBtn()"
                 ></i>
               </div>
             </div>
@@ -114,6 +56,34 @@
         </div>
       </div>
     </div>
+    <van-popup
+      v-model:show="showComment"
+      closeable
+      position="bottom"
+      :style="{ height: '66%' }"
+      @closed="showClosedToast"
+    >
+      <div @click.stop class="comment-list">
+        <Comment
+          :commentList="commentList"
+          @onComment="onComment"
+          :authorUserId="authorUserId"
+        ></Comment>
+      </div>
+      <div class="toolbar-input">
+        <div class="content-edit">
+          <p
+            contenteditable
+            class="content-input"
+            :placeholder="placeholder"
+            id="content-textarea"
+          ></p>
+          <div class="send" @click="onSendBtn">
+            <div class="text">发送</div>
+          </div>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 <script>
@@ -129,18 +99,23 @@ import WebToolkit from "@/im/utils/web-tool-kit";
 import { getClientType } from "@/utils/client-type";
 import { APP_ID } from "@/config/setting";
 import useVideoSlider from "./use-video-slider";
+import Comment from "@/views/explore-work/components/Comment.vue";
+import { addCommentApi, getCommentListApi } from "@/api/comment/index";
+import Header from "./components/Header.vue";
 export default {
   name: "VideoWork",
   components: {
     Player,
+    Comment,
+    Header,
   },
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
 
-    const playerRef = ref(null);
+    const playerRef = ref({});
 
-    const videoWorkVO = ref({});
+    const videoWorkVO = ref(null);
 
     const workStatus = ref({});
 
@@ -158,7 +133,20 @@ export default {
     watch(currentPageIndex, (newIndex) => {
       console.log(newIndex);
     });
+    function isMe() {
+      console.log(author.value.userId == userStore.getUserId());
+      return author.value.userId == userStore.getUserId();
+    }
 
+    function showAddFanBtn() {
+      if (isMe()) {
+        return false;
+      }
+      if (audience.value.isFan) {
+        return false;
+      }
+      return true;
+    }
     async function getVideoWorkDetail() {
       const params = {
         postId: router.currentRoute.value.params.id,
@@ -172,6 +160,7 @@ export default {
         videoVO.value = data.videoVO;
         author.value = data.author;
         audience.value = data.audience;
+        authorUserId.value = data.author.userId;
       }
     }
     async function addCollect() {
@@ -194,11 +183,6 @@ export default {
         audience.value.isLike = !audience.value.isLike;
       }
     }
-
-    const tempUrl = ref(
-      "http://zengshen.org:9000/easy-cloud-disk/2024-03-31/9f04e664eeca4dc88f5af3e04c82fa0a.mp4"
-    );
-
     async function deleteCollect() {
       const param = {
         postId: videoWorkVO.value.postId,
@@ -233,7 +217,7 @@ export default {
       }
     }
     async function onAddFanBtn() {
-      if (!audience.isFan) {
+      if (!audience.value.isFan) {
         await addFan();
         audience.value.isFan = true;
       }
@@ -249,7 +233,6 @@ export default {
       }
     }
 
-    function onCommentBtn() {}
     function onCollectBtn() {
       if (audience.value.isCollect) {
         deleteCollect();
@@ -261,13 +244,79 @@ export default {
     }
     function onShareBtn() {}
 
-    function goBack() {
-      router.back();
+    const showInputDiv = ref(false);
+
+    const commentList = ref([]);
+
+    const authorUserId = ref("");
+
+    const replyCommentModel = ref({});
+
+    const placeholder = ref("");
+
+    const showComment = ref(false);
+    async function onComment(commentId, userId, nickname) {
+      replyCommentModel.value = {
+        commentId,
+        userId,
+        nickname,
+      };
+      placeholder.value = `@${nickname}`;
+      showInputDiv.value = !showComment.value;
+    }
+    async function onCommentBtn() {
+      await getCommentList();
+      showComment.value = true;
+      replyCommentModel.value = null;
+      placeholder.value = "";
+    }
+    function showClosedToast() {
+      placeholder.value = "";
+      replyCommentModel.value = null;
+    }
+    async function getCommentList() {
+      const param = {
+        postId: router.currentRoute.value.params.id,
+        commentId: 0,
+        userId: userStore.getUserId(),
+        page: 1,
+        pageSize: 10,
+      };
+      const { msg, data, code } = await getCommentListApi(param);
+      if (code === 0) {
+        commentList.value = data;
+      }
+    }
+    async function addComment(content, type, parentId) {
+      const param = {
+        userId: userStore.getUserId(),
+        postId: videoWorkVO.value.postId,
+        content,
+        type,
+        parentId,
+      };
+      const { msg, data, code } = await addCommentApi(param);
+      if (code == 0) {
+        showInputDiv.value = false;
+        if (type == 0) {
+          document.getElementById("content-textarea").innerText = "";
+          getCommentList();
+        }
+      }
+    }
+    async function onSendBtn() {
+      const p = document.getElementById("content-textarea");
+      if (replyCommentModel.value?.commentId) {
+        addComment(p.innerText, 0, replyCommentModel.value.commentId);
+      } else {
+        addComment(p.innerText, 0, null);
+      }
+      replyCommentModel.value = null;
+      placeholder.value = "";
     }
     getVideoWorkDetail();
     return {
       playerRef,
-      goBack,
       onLikeBtn,
       onCommentBtn,
       onCollectBtn,
@@ -280,7 +329,16 @@ export default {
       audience,
       author,
       rootRef,
-      tempUrl,
+      showComment,
+      commentList,
+      onComment,
+      onSendBtn,
+      commentList,
+      authorUserId,
+      placeholder,
+      showClosedToast,
+      isMe,
+      showAddFanBtn,
     };
   },
 };
@@ -288,6 +346,91 @@ export default {
 <style lang="scss" scoped>
 .click-icon-red {
   color: rgb(227, 20, 20);
+}
+.van-overlay {
+  background: none;
+}
+.comment-list {
+  padding: 20rem 8rem 0rem 8rem;
+  margin-bottom: 108rem;
+}
+.toolbar-input {
+  position: fixed;
+  bottom: 0rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 30rem;
+  padding: 13rem 12rem;
+  border-top: 1px solid #e2e1e1;
+  z-index: 300;
+  background: #fff;
+  align-items: center;
+
+  p:empty::before {
+    content: attr(placeholder);
+    color: #ccc;
+    font-size: 16px;
+  }
+}
+.content-edit {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .send {
+    height: 26rem;
+    width: 58rem;
+    line-height: 26rem;
+    font-size: 14rem;
+    background: rgb(243, 61, 61);
+    border-radius: 20rem;
+    .text {
+      text-align: center;
+      color: #fff;
+    }
+  }
+  .content-input {
+    width: 80%;
+    cursor: text;
+    caret-color: #3d8af5;
+    margin: 0;
+    min-height: 18rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border: none;
+    border-radius: 4rem;
+    padding: 9rem 16rem;
+    border-radius: 20rem;
+    outline: none;
+    overflow-y: auto;
+    text-rendering: optimizeLegibility;
+    word-break: break-all;
+    white-space: break-spaces;
+    font-size: 15rem;
+    line-height: 22rem;
+    color: #333;
+    border-radius: 20px;
+    .inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      justify-content: flex-start;
+      color: rgba(51, 51, 51, 0.6);
+      font-size: 14rem;
+      img {
+        margin-right: 6rem;
+        width: 24rem;
+        height: 24rem;
+        border-radius: 12rem;
+        overflow: hidden;
+        color: rgba(51, 51, 51, 0.3);
+        border-style: none;
+      }
+    }
+  }
 }
 
 .video-work-container {
@@ -320,7 +463,7 @@ export default {
         .footer {
           opacity: 1;
           position: absolute;
-          bottom: 65rem;
+          bottom: 4rem;
           padding: 16rem 40rem 16rem 16rem;
           flex-direction: column;
           display: flex;
@@ -343,7 +486,7 @@ export default {
         .toolbar {
           position: absolute;
           right: 0rem;
-          bottom: 60rem;
+          bottom: 14rem;
           color: #fff;
           display: flex;
           flex-direction: column;
@@ -452,24 +595,6 @@ export default {
         .video {
           position: absolute;
         }
-      }
-    }
-  }
-  .header {
-    position: fixed;
-    top: 0;
-    height: 48rem;
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 300;
-    .left {
-      padding: 10rem;
-      .icon-back {
-        opacity: 1;
-        font-size: 30rem;
-        color: #fff;
       }
     }
   }

@@ -1,20 +1,18 @@
 <template>
   <div ref="rootRef" class="suggest">
     <ul class="suggest-list">
-      <div class="suggest-item" v-for="item in userList" :key="item.userId">
+      <div class="suggest-item" v-for="item in groupList" :key="item.id">
         <div class="left">
-          <img :src="item.avatarUrl" alt="" />
+          <img :src="item.photo" alt="" />
         </div>
         <div class="middle">
-          <div class="name">{{ item.nickname }}</div>
-          <div class="tip"></div>
+          <div class="name">{{ item.name }}</div>
+          <div class="tip">
+            {{ item.introduction }}
+          </div>
         </div>
-        <div
-          class="right no-fan-class"
-          :class="getFanClass(item.isFan, item.isFriend)"
-          @click="onFanBtn(item)"
-        >
-          <span>{{ getFollowText(item.isFan, item.isFriend) }}</span>
+        <div class="right no-fan-class">
+          <span>加入</span>
         </div>
       </div>
     </ul>
@@ -24,12 +22,11 @@
 <script>
 import { computed, nextTick, ref, watch } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
-import { getByNameOrMobileApi } from "@/api/user/user";
-import { addFanApi, deleteFanApi } from "@/api/interact/fan";
 import WebToolkit from "@/im/utils/web-tool-kit";
 import { getClientType } from "@/utils/client-type";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
+import { searchGroupApi } from "@/api/group/group";
 export default {
   name: "Suggest",
   props: {
@@ -38,7 +35,7 @@ export default {
   },
   emits: ["selectUser", "selectAdd"],
   setup(props, { emit }) {
-    const userList = ref([]);
+    const groupList = ref([]);
     const hasMore = ref(true);
     const page = ref(1);
     const pageSize = ref(1);
@@ -47,11 +44,11 @@ export default {
     const userStore = useUserStore();
 
     const noResult = computed(() => {
-      return !userList.value && !userList.value.length && !hasMore.value;
+      return !groupList.value && !groupList.value.length && !hasMore.value;
     });
 
     const loading = computed(() => {
-      return !userList.value && !userList.value.length;
+      return !groupList.value && !groupList.value.length;
     });
 
     const pullUpLoading = computed(() => {
@@ -81,12 +78,12 @@ export default {
       if (!props.query) {
         return;
       }
-      if (props.searchType != 1) {
+      if (props.searchType != 2) {
         return;
       }
       // 重置
       page.value = 1;
-      userList.value = [];
+      groupList.value = [];
       hasMore.value = true;
       const param = {
         userId: userStore.getUserId(),
@@ -94,9 +91,9 @@ export default {
         page: page.value,
         pageSize: pageSize.value,
       };
-      const { code, msg, data } = await getByNameOrMobileApi(param);
+      const { code, msg, data } = await searchGroupApi(param);
       if (code == 0) {
-        userList.value = data.list;
+        groupList.value = data.list;
         hasMore.value = !data.isLastPage;
         page.value = page.value + 1;
         await nextTick();
@@ -108,7 +105,7 @@ export default {
       if (!hasMore.value) {
         return;
       }
-      if (props.searchType != 1) {
+      if (props.searchType != 2) {
         return;
       }
       if (scroll.value.maxScrollY >= -1) {
@@ -127,9 +124,9 @@ export default {
         page: page.value,
         pageSize: pageSize.value,
       };
-      const { code, msg, data } = await getByNameOrMobileApi(param);
+      const { code, msg, data } = await searchGroupApi(param);
       if (code == 0) {
-        userList.value = userList.value.concat(data.list);
+        groupList.value = groupList.value.concat(data.list);
         hasMore.value = !data.isLastPage;
         page.value = page.value + 1;
         await nextTick();
@@ -137,58 +134,7 @@ export default {
       }
     }
 
-    function getFanClass(isFan, isFriend) {
-      return isFan || isFriend ? "fan-class" : "";
-    }
-    function getFollowText(isFan, isFriend) {
-      if (isFriend) {
-        return "朋友";
-      }
-      return isFan ? "已关注" : "关注";
-    }
-
-    function addFan(fromId, toId) {
-      const imei = WebToolkit.getDeviceInfo().system;
-      const param = {
-        fromId,
-        toId,
-        appId: APP_ID,
-        imei,
-        clientType: getClientType(imei),
-      };
-      const { code, msg, data } = addFanApi(param);
-      if (code == 0) {
-      }
-    }
-
-    // 删除粉丝
-    function deleteFan(fromId, toId) {
-      const imei = WebToolkit.getDeviceInfo().system;
-      const param = {
-        fromId,
-        toId,
-        appId: APP_ID,
-        imei,
-        clientType: getClientType(imei),
-      };
-      const { code, msg, data } = deleteFanApi(param);
-      if (code == 0) {
-      }
-    }
-
-    function onFanBtn(item) {
-      const toId = item.userId;
-      const fromId = userStore.getUserId();
-      if (item.isFan) {
-        deleteFan(fromId, toId);
-        item.isFan = false;
-        item.isFriend = false;
-      } else {
-        addFan(fromId, toId);
-        item.isFan = true;
-      }
-    }
-    return { rootRef, userList, getFanClass, getFollowText, onFanBtn };
+    return { rootRef, groupList };
   },
 };
 </script>
@@ -221,10 +167,16 @@ export default {
         flex: 1;
         margin-top: 4rem;
         padding-left: 5rem;
-        height: 43rem;
         border-bottom: 1px #ccc solid;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         .name {
-          font-size: 17rem;
+          font-size: 16rem;
+        }
+        .tip {
+          padding: 4rem 0rem;
+          font-size: 12rem;
         }
       }
       .right {
