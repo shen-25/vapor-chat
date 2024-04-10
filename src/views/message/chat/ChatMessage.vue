@@ -8,7 +8,13 @@
       {{ message.messageTime }}
     </div>
     <template v-else>
-      <img v-if="!isMe" :src="message.user.avatar" alt="" class="avatar" />
+      <img
+        v-if="!isMe"
+        :src="message.user.avatar"
+        alt=""
+        class="avatar"
+        @click="onAvatarBtn"
+      />
       <div class="chat-wrapper">
         <div class="remark" v-if="!isMe">
           {{ message.user.remark }}
@@ -69,6 +75,9 @@ export default {
       } else if (work.type === 1) {
         this.$router.push(`/recommend/${work.postId}`);
       }
+    },
+    onAvatarBtn() {
+      this.$router.push(`/userProfile/${this.message.user.userId}`);
     },
   },
 };

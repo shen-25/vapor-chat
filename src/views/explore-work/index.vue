@@ -6,7 +6,7 @@
       v-if="headerData"
     ></Header>
     <div class="scroll-wrapper" @click="hideCommentDiv">
-      <Scroll class="explore-content">
+      <Scroll class="explore-content" ref="scrollRef">
         <div>
           <div class="slider-wrapper">
             <div class="slider-content">
@@ -39,25 +39,30 @@
       <div class="content-edit">
         <div class="content-input" @click="toInput">
           <div class="inner">
-            <img
-              src="http://zengshen.org:9000/vapor-chat/google%E5%A4%B4%E5%83%8F.png"
-              alt=""
-            />
+            <img :src="getAvatar()" alt="" />
             <span>评论</span>
           </div>
         </div>
       </div>
       <div class="interact-container">
         <div class="item">
-          <i class="icon-like"></i>
+          <i
+            @click="onLikeBtn"
+            :class="workDetail.isLike ? 'icon-liked' : 'icon-like'"
+          ></i>
           <span>{{ workDetail?.statistics?.likeCount }}</span>
         </div>
         <div class="item">
-          <i class="icon-collect-blank"></i>
+          <i
+            @click="onCollectBtn"
+            :class="
+              workDetail.isCollect ? 'icon-video-collect' : 'icon-collect-blank'
+            "
+          ></i>
           <span>{{ workDetail?.statistics?.collectCount }}</span>
         </div>
         <div class="item">
-          <i class="icon-video-comment"></i>
+          <i class="icon-video-comment" @click="onCommentBtn"></i>
           <span>{{ workDetail?.statistics?.commentCount }}</span>
         </div>
       </div>
@@ -103,7 +108,13 @@ export default {
     const showInputDiv = ref(false);
     const showLine = ref(false);
 
+    const scrollRef = ref(null);
+
     const authorUserId = ref("");
+
+    function getAvatar() {
+      return userStore.getAvatar();
+    }
 
     async function getWorkPostDetail(postId) {
       const userId = userStore.getUserId();
@@ -122,6 +133,7 @@ export default {
         authorUserId.value = data.userId;
       }
     }
+
     async function getCommentList() {
       const param = {
         postId: router.currentRoute.value.params.id,
@@ -196,7 +208,8 @@ export default {
       };
       const { msg, data, code } = await addCollectApi(param);
       if (code == 0) {
-        workDetail.value.isCollect = !workDetail.value.isCollect;
+        workDetail.value.isCollect = true;
+        workDetail.value.statistics.collectCount++;
       }
     }
     async function addWorkLike() {
@@ -206,7 +219,8 @@ export default {
       };
       const { msg, data, code } = await addLikeApi(param);
       if (code == 0) {
-        workDetail.value.isLike = !workDetail.value.isLike;
+        workDetail.value.isLike = true;
+        workDetail.value.statistics.likeCount++;
       }
     }
     async function deleteCollect() {
@@ -216,7 +230,8 @@ export default {
       };
       const { msg, data, code } = await deleteCollectApi(param);
       if (code == 0) {
-        workDetail.value.isCollect = !workDetail.value.isCollect;
+        workDetail.value.isCollect = false;
+        workDetail.value.statistics.collectCount--;
       }
     }
     async function deleteWorkLike() {
@@ -226,8 +241,30 @@ export default {
       };
       const { msg, data, code } = await deleteLikeApi(param);
       if (code == 0) {
-        workDetail.value.isLike = !workDetail.value.isLike;
+        workDetail.value.isLike = false;
+        workDetail.value.statistics.likeCount--;
       }
+    }
+
+    async function onLikeBtn() {
+      if (workDetail.value.isLike) {
+        await deleteWorkLike();
+      } else {
+        await addWorkLike();
+      }
+    }
+
+    async function onCollectBtn() {
+      if (workDetail.value.isCollect) {
+        await deleteCollect();
+      } else {
+        await addCollect();
+      }
+    }
+    async function onCommentBtn() {
+      scrollRef.value.scroll.refresh();
+
+      scrollRef.value.scroll.scrollToElement(".total", 200, true, true);
     }
 
     getCommentList();
@@ -245,14 +282,16 @@ export default {
       commentList,
       onComment,
       authorUserId,
+      onLikeBtn,
+      onCollectBtn,
+      onCommentBtn,
+      scrollRef,
+      getAvatar,
     };
   },
 };
 </script>
 <style lang="scss" scoped>
-.red-class {
-  color: red;
-}
 .explore-container {
   position: fixed;
   top: 0;
@@ -343,10 +382,14 @@ export default {
         flex-direction: row;
         align-items: center;
         font-size: 14rem;
-        text-align: center;
         padding-left: 10rem;
         .icon-like {
           font-size: 23rem;
+          margin-right: 4rem;
+        }
+        .icon-liked {
+          color: red;
+          font-size: 22rem;
           margin-right: 4rem;
         }
         .icon-video-comment {
@@ -356,6 +399,11 @@ export default {
         .icon-collect-blank {
           font-size: 26rem;
           margin-right: 4rem;
+        }
+        .icon-video-collect {
+          font-size: 23rem;
+          margin-right: 4rem;
+          color: rgb(226, 177, 87);
         }
       }
     }

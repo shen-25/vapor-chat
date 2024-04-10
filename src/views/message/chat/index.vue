@@ -4,7 +4,7 @@
       <div class="left">
         <Back @click="back()" />
         <div class="badge"></div>
-        <div class="name"></div>
+        <div class="name">{{ name }}</div>
       </div>
       <div class="right">
         <i class="icon-shengluehao"></i>
@@ -86,6 +86,8 @@ export default {
     const messageList = ref([]);
 
     const isTextInput = ref(false);
+
+    const name = ref(router.currentRoute.value.query.name);
 
     watch(messageText, (newText) => {
       console.log(newText);
@@ -300,6 +302,7 @@ export default {
       onSendOtherSelect,
       clickSendOther,
       getUploadFile,
+      name,
     };
   },
 };

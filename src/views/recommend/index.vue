@@ -3,9 +3,9 @@
     <div class="header">
       <Header></Header>
     </div>
-    <Scroll class="content">
+    <Scroll class="content" :click="false">
       <div class="scroll" ref="rootRef">
-        <Preview :postList="workPostList" @select="selectWork" />
+        <Preview :postList="workPostList" @select="selectWork" @click.stop />
       </div>
     </Scroll>
     <div class="footer"><Footer /></div>
@@ -22,10 +22,13 @@ import { useRouter } from "vue-router";
 import { getWorkListApi } from "@/api/work/publish-work";
 import { ref, computed } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
+import { useUserStore } from "@/store/user";
 export default {
   components: { Header, Footer, Preview, Scroll },
   setup() {
     const router = useRouter();
+
+    const userStore = useUserStore();
 
     const workPostList = ref([]);
 
@@ -54,6 +57,7 @@ export default {
       page.value = 1;
       pageSize.value = 6;
       const param = {
+        userId: userStore.getUserId(),
         keyword: keyword.value,
         page: page.value,
         pageSize: pageSize.value,
@@ -74,6 +78,8 @@ export default {
 
     async function searchMore() {
       const param = {
+        userId: userStore.getUserId(),
+
         keyword: keyword.value,
         page: page.value,
         pageSize: pageSize.value,

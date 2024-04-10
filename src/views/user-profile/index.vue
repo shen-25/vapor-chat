@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div class="me">
+    <div class="user-profile-container">
       <div ref="float" class="float" :class="floatCls">
-        <div class="left" @click="editUserBtn" :style="floatStyle">
-          <i class="icon-edit"></i>
-          <span>编辑资料</span>
+        <div class="left" @click="goBack">
+          <i class="icon-back"></i>
         </div>
         <transition name="fade">
           <div class="center" v-if="floatFixed">
@@ -19,7 +18,7 @@
         </div>
       </div>
       <Scroll
-        class="me-content"
+        class="user-profile-content"
         :probe-type="3"
         @scroll="onScroll"
         ref="scrollRef "
@@ -47,10 +46,6 @@
                     <span>获赞</span>
                   </div>
                   <div class="text">
-                    <span class="num">{{ uerStatistics.friendCount }}</span>
-                    <span>朋友</span>
-                  </div>
-                  <div class="text">
                     <span class="num">{{ uerStatistics.followCount }}</span>
                     <span>关注</span>
                   </div>
@@ -59,7 +54,10 @@
                     <span>粉丝</span>
                   </div>
                 </div>
-                <div class="button" @click="toSearch">添加朋友</div>
+                <div class="msg-container">
+                  <div class="follow" @click="onAddFanBtn">关注</div>
+                  <div class="to-send" @click="onSendBtn">私信</div>
+                </div>
               </div>
               <div class="signature">
                 <template v-if="true">
@@ -67,7 +65,7 @@
                 </template>
               </div>
               <div class="more">
-                <div class="age item">
+                <div class="age item" v-if="userInfo">
                   <img
                     v-if="userInfo.sex == 2"
                     src="../../assets/images/icon/me/woman.png"
@@ -78,31 +76,13 @@
                     src="../../assets/images/icon/me/man.png"
                     alt=""
                   />
-                  <span>11岁</span>
+                  <span>难</span>
                 </div>
-                <div class="item">
-                  {{ userInfo.province + "- " + userInfo.city }}
+                <div class="item" v-if="userInfo.province">
+                  {{ userInfo.province + "-" + userInfo.city }}
                 </div>
-                <div class="item">{{ userInfo.school }}</div>
-              </div>
-              <div class="other">
-                <div class="item">
-                  <i class="icon-shop"></i>
-                  <span>抖音商城</span>
-                </div>
-                <div class="item">
-                  <i class="icon-music"></i>
-
-                  <span>我的音乐</span>
-                </div>
-                <div class="item">
-                  <i class="icon-group-chat"></i>
-
-                  <span>我的群聊</span>
-                </div>
-                <div class="item">
-                  <i class="icon-navigation"></i>
-                  <span>查看更多</span>
+                <div class="item" v-if="userInfo.school">
+                  {{ userInfo.school }}
                 </div>
               </div>
             </div>
@@ -125,7 +105,6 @@
       v-model:currentTabIndex="currentTabIndex"
     >
     </Indicator>
-    <Footer /><router-view></router-view>
   </div>
 </template>
 
@@ -135,9 +114,7 @@ import Scroll from "@/components/base/scroll/Scroll";
 import Preview from "@/components/preview/index.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import Footer from "@/components/footer/Footer.vue";
 import { getUserInfoApi } from "@/api/user/user";
-import { useUserStore } from "@/store/user";
 import { getMyWorkListApi } from "@/api/work/publish-work";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
 import {
@@ -151,15 +128,11 @@ export default {
     Indicator,
     Scroll,
     Preview,
-    Footer,
   },
   setup() {
     const tabTexts = [
       {
         name: "作品",
-      },
-      {
-        name: "私密",
       },
       {
         name: "喜欢",
@@ -169,7 +142,6 @@ export default {
       },
     ];
     const router = useRouter();
-    const userStore = useUserStore();
 
     const userInfo = ref({});
     const scrollRef = ref(null);
@@ -180,6 +152,8 @@ export default {
     const floatFixed = ref(false);
 
     const currentTabIndex = ref(0);
+
+    const userId = ref(router.currentRoute.value.params.id);
 
     const slideRowListStyle = computed(() => {
       return {
@@ -208,11 +182,6 @@ export default {
       searchFirst();
     });
 
-    function editUserBtn() {
-      router.push({
-        path: `/me/userInfo/edit`,
-      });
-    }
     function onScroll(pos) {
       scrollY.value = -pos.y;
       if (scrollY.value >= DISTANCE) {
@@ -229,7 +198,7 @@ export default {
 
     async function getUserInfo() {
       const param = {
-        userId: userStore.getUserId(),
+        userId: userId.value,
       };
       const { msg, code, data } = await getUserInfoApi(param);
       if (code === 0) {
@@ -259,7 +228,7 @@ export default {
 
     async function searchFirst() {
       const param = {
-        userId: userStore.getUserId(),
+        userId: userId.value,
         page: page.value,
         pageSize: pageSize.value,
       };
@@ -270,11 +239,11 @@ export default {
           const { code, msg, data } = await getMyWorkListApi(param);
           tmpCode = code;
           tempData = data;
-        } else if (currentTabIndex.value == 2) {
+        } else if (currentTabIndex.value == 1) {
           const { code, msg, data } = await getWorkLikedPageListApi(param);
           tmpCode = code;
           tempData = data;
-        } else if (currentTabIndex.value == 3) {
+        } else if (currentTabIndex.value == 2) {
           const { code, msg, data } = await getWorkCollectPageListApi(param);
           tmpCode = code;
           tempData = data;
@@ -293,7 +262,7 @@ export default {
 
     async function searchMore() {
       const param = {
-        userId: userStore.getUserId(),
+        userId: userId.value,
         page: page.value,
         pageSize: pageSize.value,
       };
@@ -304,11 +273,11 @@ export default {
           const { code, msg, data } = await getMyWorkListApi(param);
           tmpCode = code;
           tempData = data;
-        } else if (currentTabIndex.value == 2) {
+        } else if (currentTabIndex.value == 1) {
           const { code, msg, data } = await getWorkLikedPageListApi(param);
           tmpCode = code;
           tempData = data;
-        } else if (currentTabIndex.value == 3) {
+        } else if (currentTabIndex.value == 2) {
           const { code, msg, data } = await getWorkCollectPageListApi(param);
           tmpCode = code;
           tempData = data;
@@ -351,7 +320,7 @@ export default {
 
     async function getUerStatistics() {
       const param = {
-        userId: userStore.getUserId(),
+        userId: userId.value,
       };
       const { msg, code, data } = await getUerStatisticsApi(param);
       if (code == 0) {
@@ -364,13 +333,20 @@ export default {
     getUerStatistics();
     getUserInfo();
 
-    function toSearch() {
-      router.push("/friend/find");
+    function goBack() {
+      router.back();
     }
+
+    function onSendBtn() {
+      router.push({
+        path: `/message/${userId.value}`,
+      });
+    }
+
+    function onAddFanBtn() {}
 
     return {
       slideRowListStyle,
-      editUserBtn,
       selectWork,
       userInfo,
       scrollRef,
@@ -387,7 +363,9 @@ export default {
       likeWorkPostList,
       getSignature,
       uerStatistics,
-      toSearch,
+      goBack,
+      onSendBtn,
+      onAddFanBtn,
     };
   },
 };
@@ -442,11 +420,14 @@ export default {
     height: $h;
     display: flex;
     gap: 6rem;
-    padding: 0 10rem;
+    padding: 0 6rem;
     align-items: center;
     border-radius: 20rem;
     background: rgba(82, 80, 80, 0.5);
     color: white;
+    .icon-back {
+      font-size: 20rem;
+    }
 
     svg {
       font-size: 16rem;
@@ -471,16 +452,16 @@ export default {
     }
   }
 }
-.me {
+.user-profile-container {
   position: fixed;
   background: #fff;
   width: 100%;
   top: 0rem;
-  bottom: 46rem;
+  bottom: 0rem;
   overflow: scroll;
   z-index: 10;
 }
-.me-content {
+.user-profile-content {
   height: 100%;
   overflow: hidden;
 }
@@ -545,20 +526,17 @@ export default {
       justify-content: space-between;
       align-items: center;
       box-sizing: border-box;
-
       .heat {
         color: #000;
         display: flex;
         gap: 30rem;
         align-items: center;
         justify-content: space-between;
-
         .num {
           color: #000;
           font-size: 15rem;
           font-weight: bold;
         }
-
         .text {
           font-size: 13rem;
           display: flex;
@@ -566,17 +544,30 @@ export default {
           flex-direction: column;
         }
       }
-
-      .button {
-        position: relative;
-        padding: 8rem 20rem;
-        font-size: 15rem;
+      .msg-container {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
-        border-radius: 4rem;
-        background: #ccc;
-        color: #000;
+        .follow {
+          width: 80rem;
+          height: 30rem;
+          border-radius: 10rem;
+          background: rgb(244, 59, 59);
+          font-size: 16rem;
+          line-height: 30rem;
+          text-align: center;
+          color: #fff;
+          margin-right: 18rem;
+        }
+        .to-send {
+          width: 50rem;
+          height: 30rem;
+          border-radius: 10rem;
+          font-size: 16rem;
+          line-height: 30rem;
+          text-align: center;
+          background: #f1eeee;
+        }
       }
     }
 

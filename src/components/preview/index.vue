@@ -10,12 +10,17 @@
           <span v-html="item.title"></span>
         </div>
         <div class="wrapper">
-          <div class="author-wrapper">
+          <div class="author-wrapper" @click="onAuthorBtn(item.userId)">
             <img :src="item.avatar" alt="" class="author-avatar" />
             <span class="name">{{ item.nickname }}</span>
           </div>
           <div class="like-wrapper">
-            <Like />
+            <Like
+              :isLike="item.isLike"
+              :likeCount="item.likeCount"
+              :userId="userId"
+              :postId="item.postId"
+            ></Like>
           </div>
         </div>
       </div>
@@ -25,7 +30,8 @@
 
 <script>
 import Like from "@/components/like/index.vue";
-import { onBeforeMount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/user";
 export default {
   name: "preView",
   components: {
@@ -39,12 +45,23 @@ export default {
   },
   emits: ["select"],
   setup(props, { emit }) {
+    const router = useRouter();
+
+    const userStore = useUserStore();
+
+    const userId = userStore.getUserId();
+
     function onItemClick(work) {
       emit("select", work);
+    }
+    function onAuthorBtn(userId) {
+      router.push(`/userProfile/${userId}`);
     }
 
     return {
       onItemClick,
+      onAuthorBtn,
+      userId,
     };
   },
 };

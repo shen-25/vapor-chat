@@ -1,43 +1,76 @@
 <template>
   <div class="like-container">
-    <i :class="iconClass" @click="onLike"></i>
-    <span class="count">{{ count }}</span>
+    <i :class="iconClass"></i>
+    <span class="count" @click="onLikeBtn">{{ count }}</span>
   </div>
 </template>
 
 <script>
+import { addLikeApi, deleteLikeApi } from "@/api/interact/like";
+import { cloneDeep } from "lodash-es";
+import { computed, ref } from "vue";
+
 export default {
   name: "like",
   props: {
-    pLike: {
-      Type: Boolean,
+    isLike: {
+      type: Boolean,
       default: false,
     },
-    pCount: {
-      Type: Number,
-      default: 0,
+    likeCount: {
+      type: String,
+      default: "0",
     },
-    // pPostId: {
-    //   Type: String,
-    //   required: true,
-    // },
+    userId: {
+      type: String,
+    },
+    postId: {
+      type: String,
+    },
   },
-  data() {
+  setup(props) {
+    const like = ref(cloneDeep(props.isLike));
+    const count = ref(cloneDeep(props.likeCount));
+    const iconClass = computed(() => {
+      return like.value ? "icon-liked" : "icon-like";
+    });
+    function onLikeBtn() {
+      if (like.value) {
+        deleteWorkLike();
+        return;
+      } else {
+        addWorkLike();
+        return;
+      }
+    }
+    async function addWorkLike() {
+      const param = {
+        postId: props.postId,
+        userId: props.userId,
+      };
+      const { msg, data, code } = await addLikeApi(param);
+      if (code == 0) {
+        like.value = true;
+        count.value++;
+      }
+    }
+    async function deleteWorkLike() {
+      const param = {
+        postId: props.postId,
+        userId: props.userId,
+      };
+      const { msg, data, code } = await deleteLikeApi(param);
+      if (code == 0) {
+        like.value = false;
+        count.value--;
+      }
+    }
     return {
-      like: this.pLike,
-      count: this.pCount,
+      iconClass,
+      like,
+      count,
+      onLikeBtn,
     };
-  },
-  computed: {
-    iconClass() {
-      return this.like ? "icon-liked" : "icon-like";
-    },
-  },
-  methods: {
-    onLike() {
-      this.like = !this.like;
-      this.like === true ? this.count++ : this.count--;
-    },
   },
 };
 </script>
@@ -47,6 +80,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2000;
   .icon-like {
     font-size: 16rem;
   }

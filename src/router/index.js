@@ -54,6 +54,11 @@ const routes = [
     name: "VideoWork",
     component: () => import("@/views/video-work/index.vue"),
   },
+  {
+    path: "/userProfile/:id",
+    name: "userProfile",
+    component: () => import("@/views/user-profile/index.vue"),
+  },
 
   {
     path: "/publishWork",

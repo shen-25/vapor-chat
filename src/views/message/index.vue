@@ -24,7 +24,7 @@
               class="notice"
               v-for="(item, index) in conversationList"
               :key="index"
-              @click="onChat(item.toId, item.type)"
+              @click="onChat(item.toId, item.type, item.name)"
             >
               <div class="avatar">
                 <img :src="item.avatar" alt="" class="head-image" />
@@ -35,9 +35,7 @@
                     <span>{{ item.name }}</span>
                   </div>
                   <div class="detail">
-                    <div class="title">
-                      协议修订通知协议修订通知协议修订通知协议修订通知协议修订通知
-                    </div>
+                    <div class="title">订通知</div>
                   </div>
                 </div>
                 <div class="right">
@@ -65,6 +63,7 @@ import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { APP_ID, ConversationTypeEnum } from "@/config/setting";
 import { getConversationApi } from "@/api/conversation/index";
+
 export default {
   components: {
     Footer,
@@ -77,11 +76,15 @@ export default {
 
     const conversationList = ref([]);
 
-    function onChat(toId, type) {
+    function onChat(toId, type, name) {
       if (type == ConversationTypeEnum.p2p)
-        router.push({ path: `/message/${toId}` });
+        router.push({
+          path: `/message/${toId}`,
+        });
       if (type == ConversationTypeEnum.group) {
-        router.push({ path: `/group/list/${toId}` });
+        router.push({
+          path: `/group/list/${toId}`,
+        });
       }
     }
     async function getConversation() {
