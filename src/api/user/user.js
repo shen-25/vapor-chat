@@ -7,6 +7,8 @@ const UserApi = {
   editUserInfo: "/user/edit/info",
   getByNameOrMobile: "/user/getByNameOrMobile",
   editUserEduction: "/user/edit/eduction",
+  sendEmailCode: "/user/send/email",
+  forgetPassword: "/user/forget/password",
 };
 
 /**
@@ -24,6 +26,14 @@ export function loginApi(param) {
  */
 export function registerApi(param) {
   return request.post(UserApi.register, {
+    data: param,
+  });
+}
+/**
+ * 忘记密码
+ */
+export function forgetPasswordApi(param) {
+  return request.put(UserApi.forgetPassword, {
     data: param,
   });
 }
@@ -54,5 +64,15 @@ export function editUserEductionApi(param) {
 export function getByNameOrMobileApi(param) {
   return request.get(UserApi.getByNameOrMobile, {
     params: param,
+  });
+}
+
+/**
+ * 获取邮箱验证码
+ * @param {*} param 注册参数
+ */
+export function sendEmailCodeApi(param) {
+  return request.post(UserApi.sendEmailCode, {
+    data: param,
   });
 }

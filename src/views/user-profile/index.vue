@@ -12,8 +12,8 @@
         </transition>
 
         <div class="right">
-          <div class="item">
-            <i class="icon-share"></i>
+          <div class="item" @click="onShareBtn">
+            <i class="icon-shengluehao"></i>
           </div>
         </div>
       </div>
@@ -105,6 +105,12 @@
       v-model:currentTabIndex="currentTabIndex"
     >
     </Indicator>
+    <van-share-sheet
+      v-model:show="showShare"
+      title="分享至"
+      :options="shareOptions"
+      @select="onShareSelect"
+    />
   </div>
 </template>
 
@@ -123,7 +129,7 @@ import {
 } from "@/api/work/publish-work";
 import { getUerStatisticsApi } from "@/api/interact/fan";
 export default {
-  name: "Me",
+  name: "userProfile",
   components: {
     Indicator,
     Scroll,
@@ -345,6 +351,32 @@ export default {
 
     function onAddFanBtn() {}
 
+    // 分享按钮
+    const showShare = ref(false);
+    const shareOptions = [
+      [
+        { name: "私信好友", icon: "wechat" },
+        { name: "朋友圈", icon: "wechat-moments" },
+        { name: "微博", icon: "weibo" },
+        { name: "QQ", icon: "qq" },
+      ],
+      [
+        { name: "复制链接", icon: "link" },
+        { name: "举报", icon: "qrcode" },
+        { name: "拉黑", icon: "weapp-qrcode" },
+      ],
+    ];
+    function onShareBtn() {
+      showShare.value = true;
+    }
+
+    const onShareSelect = (shareOptions) => {
+      if (shareOptions.name == "举报") {
+        router.push(`/report/${userId.value}`);
+      }
+      showShare.value = false;
+    };
+
     return {
       slideRowListStyle,
       selectWork,
@@ -366,6 +398,11 @@ export default {
       goBack,
       onSendBtn,
       onAddFanBtn,
+      //
+      showShare,
+      shareOptions,
+      onShareBtn,
+      onShareSelect,
     };
   },
 };
@@ -412,9 +449,7 @@ export default {
       // background: #fff !important;
     }
   }
-
   $h: 30rem;
-
   .left {
     font-size: 14rem;
     height: $h;
@@ -428,12 +463,10 @@ export default {
     .icon-back {
       font-size: 20rem;
     }
-
     svg {
       font-size: 16rem;
     }
   }
-
   .right {
     display: flex;
     .item {
@@ -445,9 +478,9 @@ export default {
       background: rgba(82, 80, 80, 0.5);
       border-radius: 50%;
       margin-left: 10rem;
-      .icon-share {
+      .icon-shengluehao {
         color: white;
-        font-size: 20rem;
+        font-size: 22rem;
       }
     }
   }
@@ -465,7 +498,6 @@ export default {
   height: 100%;
   overflow: hidden;
 }
-
 .desc {
   header {
     position: relative;
@@ -510,9 +542,7 @@ export default {
       }
     }
   }
-
   $p: 15rem;
-
   .detail {
     transform: translateY(-10rem);
     background: #fff;
@@ -570,24 +600,20 @@ export default {
         }
       }
     }
-
     .signature {
       font-size: 13rem;
       color: #000;
       display: flex;
       align-items: center;
       margin-bottom: 8rem;
-
       img {
         height: 12rem;
         margin-left: 6rem;
       }
-
       .text {
         white-space: pre-wrap;
       }
     }
-
     .more {
       margin-bottom: 10rem;
       display: flex;
@@ -606,7 +632,6 @@ export default {
         }
       }
     }
-
     .other {
       display: flex;
       justify-content: space-between;
@@ -618,7 +643,6 @@ export default {
         color: gray;
         gap: 6rem;
         font-size: 12rem;
-
         i {
           font-size: 24rem;
         }

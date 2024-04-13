@@ -5,7 +5,7 @@ import ByteBuffer from "../utils/codec/byte-buffer";
 import { sleep, getLen } from "./main-constant";
 import { MessagePack } from "../model/pack/message-pack";
 import { heartbeatInterval, StateEnum } from "./main-constant";
-import { SystemCommand, MessageCommand, GroupCommand } from "../commom/command";
+import { SystemCommand, MessageCommand, GroupCommand } from "../common/command";
 import WebToolkit from "../utils/web-tool-kit";
 let firstMonitorSocket = false; // 第一次监听socket
 
@@ -40,6 +40,7 @@ export default class UseImClient {
     onSocketCloseEvent: function () {
       // 连接关闭事件处理逻辑
     },
+    onUserMutualLoginEvent: function () {},
     onP2PMessage: function (e) {
       // 收到单聊消息事件处理逻辑
     },
@@ -141,6 +142,12 @@ export default class UseImClient {
         } else if (command === GroupCommand.MSG_GROUP) {
           if (typeof useImClient.listeners.onGroupMessage === "function") {
             useImClient.listeners.onGroupMessage(msgBody);
+          }
+        } else if (command === SystemCommand.MUTUAL_LOGIN) {
+          if (
+            typeof useImClient.listeners.onUserMutualLoginEvent === "function"
+          ) {
+            useImClient.listeners.onUserMutualLoginEvent(msgBody);
           }
         }
       };

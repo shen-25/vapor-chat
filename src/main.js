@@ -25,6 +25,9 @@ import {
   Switch,
   TextEllipsis,
   ShareSheet,
+  Radio,
+  RadioGroup,
+  Notify,
 } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
@@ -51,4 +54,8 @@ app.use(CheckboxGroup);
 app.use(Switch);
 app.use(TextEllipsis);
 app.use(ShareSheet);
+app.use(Radio);
+app.use(RadioGroup);
+app.use(Notify);
+
 app.use(Button).use(DatePicker).use(Popup).use(Area).mount("#app");

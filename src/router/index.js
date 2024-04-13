@@ -22,6 +22,16 @@ const routes = [
     component: () => import("@/views/common/register/index.vue"),
   },
   {
+    path: "/forget",
+    name: "Forget",
+    component: () => import("@/views/common/forget/index.vue"),
+  },
+  {
+    path: "/report/:id",
+    name: "Report",
+    component: () => import("@/views/report/index.vue"),
+  },
+  {
     path: "/friend/find",
     name: "findFriend",
     component: () => import("@/views/friend/find/index.vue"),

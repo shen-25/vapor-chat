@@ -1,7 +1,7 @@
 <template>
   <div class="preview-image-container">
-    <Scroll :scrollX="true" class="scroll-container" @click.stop>
-      <div class="scroll-content" @click.stop>
+    <Scroll :scrollX="true" class="scroll-container" :click="false">
+      <div class="scroll-content">
         <div
           class="item"
           v-for="(item, index) in uploadFileList"
@@ -9,16 +9,19 @@
           :class="addMarLeft10Cls(index)"
         >
           <img :src="item" alt="" />
+          <div class="button" @click.stop="onDeleteImageBtn(index)">
+            <i class="icon-wrong"></i>
+          </div>
+        </div>
+        <div class="upload-tip mar-left-8">
+          <FileUploader @completeOneFile="getUploadFile" class="file-uploader">
+            <template v-slot:center>
+              <i class="icon-add"></i>
+            </template>
+          </FileUploader>
         </div>
       </div>
     </Scroll>
-    <div class="upload-tip mar-left-8">
-      <FileUploader @completeOneFile="getUploadFile" class="file-uploader">
-        <template v-slot:center>
-          <i class="icon-add"></i>
-        </template>
-      </FileUploader>
-    </div>
   </div>
 </template>
 
@@ -43,7 +46,10 @@ export default {
     function addMarLeft10Cls(index) {
       return index > 0 ? "mar-left-8" : "";
     }
-    return { getUploadFile, addMarLeft10Cls };
+    function onDeleteImageBtn(index) {
+      props.uploadFileList.splice(index, 1);
+    }
+    return { getUploadFile, addMarLeft10Cls, onDeleteImageBtn };
   },
 };
 </script>
@@ -51,9 +57,10 @@ export default {
 <style lang="scss" scoped>
 .icon-add {
   text-align: center;
-
-  font-size: 60rem;
+  font-size: 30rem;
+  color: #dcdee0;
 }
+
 .preview-image-container {
   display: flex;
   align-items: center;
@@ -67,16 +74,32 @@ export default {
       display: flex;
       flex-direction: row;
       .item {
+        position: relative;
         border-radius: 8rem;
         height: 110rem;
         width: 128rem;
         img {
           height: 110rem;
           width: 128rem;
-          // object-fit: cover;
+          object-fit: cover;
+          overflow-clip-margin: content-box;
+          overflow: clip;
+        }
+        .button {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 14rem;
+          height: 14rem;
+          background: rgba(0, 0, 0, 0.7);
+          border-radius: 0 0 0 12rem;
+          .icon-wrong {
+            font-size: 16rem;
+            text-align: center;
+            color: #fff;
+          }
         }
       }
-
       .mar-left-8 {
         margin-left: 8rem;
       }
@@ -85,7 +108,7 @@ export default {
   .upload-tip {
     height: 110rem;
     width: 128rem;
-    background-color: #ccc;
+    background-color: #f7f8fa;
     .file-uploader {
       height: 110rem;
       width: 128rem;

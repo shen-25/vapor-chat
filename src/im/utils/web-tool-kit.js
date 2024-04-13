@@ -1,5 +1,5 @@
 import { Base64 } from "./base64";
-import Fetch from "../commom/fetch";
+import Fetch from "../common/fetch";
 export default class WebToolkit {
   // 获取浏览器信息
   static getBrowserInfo() {

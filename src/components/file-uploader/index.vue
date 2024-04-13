@@ -1,5 +1,5 @@
 <template>
-  <div id="upload-content" v-if="show">
+  <div id="upload-content" v-if="show" @click.stop>
     <slot name="center"><div></div></slot>
   </div>
 </template>

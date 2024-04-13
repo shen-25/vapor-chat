@@ -1,5 +1,5 @@
 <template>
-  <div class="register-container">
+  <div class="forget-container">
     <div class="header">
       <!-- <i class="icon-back" @click="goBack"></i> -->
     </div>
@@ -11,13 +11,13 @@
       <van-form @submit="onSubmit">
         <van-cell-group inset>
           <van-field
-            v-model="registerModel.email"
+            v-model="forgetModel.email"
             name="email"
             placeholder="邮箱"
           />
           <div class="emailCode">
             <van-field
-              v-model="registerModel.emailCode"
+              v-model="forgetModel.emailCode"
               name="code"
               placeholder="邮箱验证码"
             >
@@ -37,13 +37,14 @@
           </div>
 
           <van-field
-            v-model="registerModel.password"
+            v-model="forgetModel.password"
             class="password"
             type="password"
             name="密码"
             placeholder="密码"
+            show-password-immediately
           /><van-field
-            v-model="registerModel.confirmPassword"
+            v-model="forgetModel.confirmPassword"
             class="password"
             type="password"
             name="确认密码"
@@ -52,14 +53,12 @@
         </van-cell-group>
         <div class="submit">
           <van-button block type="primary" native-type="submit">
-            注册
+            重置密码
           </van-button>
         </div>
       </van-form>
       <div class="tip">
-        <a href="#/login">登录</a>
-        <span>|</span>
-        <a href="#/forget">忘记密码</a>
+        <a href="#/login">返回登录</a>
       </div>
     </div>
   </div>
@@ -67,7 +66,7 @@
 
 <script>
 import { computed, ref } from "vue";
-import { registerApi, sendEmailCodeApi } from "@/api/user/user.js";
+import { forgetPasswordApi, sendEmailCodeApi } from "@/api/user/user.js";
 import { useRouter } from "vue-router";
 import { showNotify } from "vant";
 
@@ -79,26 +78,26 @@ export default {
 
     const showTime = ref(false);
     const countdown = ref(5 * 60);
-    const registerModel = ref({
+    const forgetModel = ref({
       email: "",
       password: "",
       confirmPassword: "",
       emailCode: "",
     });
     async function onSubmit() {
-      const { code, msg, data } = await registerApi({
-        ...registerModel.value,
+      const { code, msg, data } = await forgetPasswordApi({
+        ...forgetModel.value,
       });
       if (code === 0) {
-        showNotify({ type: "success", message: "注册成功,即将前往登录" });
+        showNotify({ type: "success", message: "重置密码成功,即将前往登录" });
         router.push("/login");
-        resetRegisterModel();
+        resetForgetModel();
       } else {
         showNotify({ type: "warning", message: msg });
       }
     }
-    function resetRegisterModel() {
-      registerModel.value = {
+    function resetForgetModel() {
+      forgetModel.value = {
         email: "",
         password: "",
         confirmPassword: "",
@@ -106,11 +105,12 @@ export default {
       };
     }
     async function onEmailCodeBtn() {
-      if (!registerModel.value.email) {
+      if (!forgetModel.value.email) {
         showNotify({ type: "warning", message: "邮箱格式不正确" });
       }
       const param = {
-        email: registerModel.value.email,
+        email: forgetModel.value.email,
+        isCheckEmail: true,
       };
       const { code, msg, data } = await sendEmailCodeApi(param);
       if (code == 0) {
@@ -144,13 +144,9 @@ export default {
       }
     });
 
-    function goBack() {
-      router.back();
-    }
     return {
-      registerModel,
+      forgetModel,
       onSubmit,
-      goBack,
       showTime,
       onEmailCodeBtn,
       countdown,
@@ -161,7 +157,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.register-container {
+.forget-container {
   background-color: #ffffff;
   position: fixed;
   width: 100%;

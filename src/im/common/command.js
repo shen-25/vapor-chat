@@ -137,10 +137,10 @@ const SystemCommand = {
   LOGIN: 0x2328,
 
   //登录ack  9001
-  LOGINACK: 0x2329,
+  LOGIN_ACK: 0x2329,
 
   //下线通知 用于多端互斥  9002
-  MUTUALLOGIN: 0x232a,
+  MUTUAL_LOGIN: 9002,
 
   //登出  9003
   LOGOUT: 0x232b,
