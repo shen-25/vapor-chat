@@ -1,7 +1,7 @@
 <template>
-  <div class="preview-container">
+  <div class="preview-container" @click.stop>
     <div class="preview-item" v-for="item in postList" :key="item">
-      <div class="img-container" @click="onItemClick(item)">
+      <div class="img-container" @click.stop="onItemClick(item)">
         <img class="picture" :src="item.coverUrl" />
         <i class="icon-isVideo-tip" v-if="item.type === 0"></i>
       </div>
@@ -20,6 +20,7 @@
               :likeCount="item.likeCount"
               :userId="userId"
               :postId="item.postId"
+              @click.stop
             ></Like>
           </div>
         </div>

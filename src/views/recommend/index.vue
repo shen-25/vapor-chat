@@ -1,7 +1,18 @@
 <template>
   <div class="recommend-container">
     <div class="header">
-      <Header></Header>
+      <div class="left">
+        <i class="icon-nav"></i>
+      </div>
+      <Indicator
+        class="nav"
+        :tabTexts="tabTexts"
+        v-model:currentTabIndex="currentTabIndex"
+      >
+      </Indicator>
+      <div class="search" @click="onSearchBtn">
+        <i class="icon-search"></i>
+      </div>
     </div>
     <Scroll class="content" :click="false">
       <div class="scroll" ref="rootRef">
@@ -14,18 +25,30 @@
 </template>
 
 <script>
-import Header from "./header/Header";
+import Indicator from "@/components/slide/Indicator";
+
 import Footer from "@/components/footer/Footer.vue";
 import Preview from "@/components/preview/index.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
-import { getWorkListApi } from "@/api/work/publish-work";
-import { ref, computed } from "vue";
+import { getWorkListApi, getFollowWorkListApi } from "@/api/work/publish-work";
+import { ref, computed, watch } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
 import { useUserStore } from "@/store/user";
 export default {
-  components: { Header, Footer, Preview, Scroll },
+  components: { Footer, Preview, Scroll, Indicator },
   setup() {
+    const tabTexts = [
+      {
+        name: "关注",
+      },
+      {
+        name: "推荐",
+      },
+    ];
+
+    const currentTabIndex = ref(1);
+
     const router = useRouter();
 
     const userStore = useUserStore();
@@ -53,23 +76,45 @@ export default {
       preventPullUpLoad
     );
 
+    watch(currentTabIndex, () => {
+      workPostList.value = [];
+      isLastPage.value = false;
+      page.value = 1;
+      searchFirst();
+    });
+
     async function searchFirst() {
       page.value = 1;
-      pageSize.value = 6;
-      const param = {
-        userId: userStore.getUserId(),
-        keyword: keyword.value,
-        page: page.value,
-        pageSize: pageSize.value,
-      };
+      pageSize.value = 10;
+      let tmpCode = 1;
+      let tempData;
       try {
-        const { code, msg, data } = await getWorkListApi(param);
-        if (code !== 0) {
+        if (currentTabIndex.value == 1) {
+          const param = {
+            userId: userStore.getUserId(),
+            keyword: keyword.value,
+            page: page.value,
+            pageSize: pageSize.value,
+          };
+          const { code, msg, data } = await getWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else {
+          const param = {
+            userId: userStore.getUserId(),
+            page: page.value,
+            pageSize: pageSize.value,
+          };
+          const { code, msg, data } = await getFollowWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        }
+        if (tmpCode !== 0) {
           return;
         }
         // 修改页码和数据总条数、表格赋值
-        workPostList.value = data.list || [];
-        isLastPage.value = data.isLastPage;
+        workPostList.value = tempData.list || [];
+        isLastPage.value = tempData.isLastPage;
         page.value = page.value + 1;
       } catch (e) {
       } finally {
@@ -77,21 +122,35 @@ export default {
     }
 
     async function searchMore() {
-      const param = {
-        userId: userStore.getUserId(),
-
-        keyword: keyword.value,
-        page: page.value,
-        pageSize: pageSize.value,
-      };
+      let tmpCode = 1;
+      let tempData;
       try {
-        const { code, msg, data } = await getWorkListApi(param);
-        if (code !== 0) {
+        if (currentTabIndex.value == 1) {
+          const param = {
+            userId: userStore.getUserId(),
+            keyword: keyword.value,
+            page: page.value,
+            pageSize: pageSize.value,
+          };
+          const { code, msg, data } = await getWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else {
+          const param = {
+            userId: userStore.getUserId(),
+            page: page.value,
+            pageSize: pageSize.value,
+          };
+          const { code, msg, data } = await getFollowWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        }
+        if (tmpCode !== 0) {
           return;
         }
         // 修改页码和数据总条数、表格赋值
-        workPostList.value = workPostList.value.concat(data.list);
-        isLastPage.value = data.isLastPage;
+        workPostList.value = tempData.list || [];
+        isLastPage.value = tempData.isLastPage;
         page.value = page.value + 1;
       } catch (e) {
       } finally {
@@ -116,7 +175,7 @@ export default {
 
     searchFirst();
 
-    return { workPostList, selectWork, rootRef };
+    return { workPostList, selectWork, rootRef, tabTexts, currentTabIndex };
   },
 };
 </script>
@@ -130,8 +189,34 @@ export default {
   background: #fff;
   z-index: 900;
   .header {
-    border-bottom: 0.4px solid #f8ecec;
-    margin-bottom: 1rem;
+    border-bottom: 0.6px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    height: 44px;
+    text-align: center;
+    font-size: 0;
+    .left {
+      .icon-nav {
+        display: block;
+        padding: 11px;
+        font-size: $font-size-large-x;
+      }
+    }
+    .nav {
+      font-size: 14rem;
+      width: 36%;
+      height: 38rem;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+    }
+    .search {
+      .icon-search {
+        display: block;
+        padding: 12px;
+        font-size: $font-size-large-x;
+      }
+    }
   }
   .content {
     height: 100%;

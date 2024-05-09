@@ -47,7 +47,7 @@
           />
         </div>
         <div class="extraneous-info">
-          <div class="location">
+          <!-- <div class="location">
             <van-field
               v-model="locationResult"
               is-link
@@ -57,7 +57,7 @@
               placeholder="点击选择地点"
               @click="showLocationPicker = true"
             ></van-field>
-          </div>
+          </div> -->
           <div class="visible">
             <van-field
               v-model="visibleResult"
@@ -137,8 +137,8 @@ export default {
       { text: "湖州", value: "huzhou" },
     ];
     const visibleColumns = [
-      { text: "公开可见", value: "1" },
-      { text: "仅自己可见", value: "0" },
+      { text: "公开可见", value: "0" },
+      { text: "仅自己可见", value: "1" },
     ];
 
     const onLocationConfirm = ({ selectedOptions }) => {

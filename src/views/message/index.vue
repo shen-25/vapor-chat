@@ -35,12 +35,24 @@
                     <span>{{ item.name }}</span>
                   </div>
                   <div class="detail">
-                    <div class="title">订通知</div>
+                    <div
+                      class="title"
+                      v-if="item.messageType == MESSAGE_TYPE.TEXT"
+                    >
+                      {{ item.messageContent }}
+                    </div>
                   </div>
                 </div>
                 <div class="right">
-                  <div class="time">03-19</div>
-                  <div class="icon">3</div>
+                  <div class="time" v-if="item.messageTime">
+                    {{ getDHM(item.messageTime) }}
+                  </div>
+                  <div
+                    class="icon"
+                    v-if="item.noReadCount && item.noReadCount != 0"
+                  >
+                    {{ item.noReadCount }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -58,12 +70,13 @@
 import Footer from "@/components/footer/Footer.vue";
 import BaseHeader from "@/components/base/back/BaseHeader.vue";
 import Scroll from "@/components/base/scroll/Scroll";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { APP_ID, ConversationTypeEnum } from "@/config/setting";
-import { getConversationApi } from "@/api/conversation/index";
-
+import { useConversationStore } from "@/store/conversation";
+import { MESSAGE_TYPE } from "./chat/use-chat";
+import { getDHM } from "@/utils/time";
 export default {
   components: {
     Footer,
@@ -72,11 +85,19 @@ export default {
   },
   setup() {
     const userStore = useUserStore();
+
+    const conversationStore = useConversationStore();
+
+    conversationStore.setConversationList();
+
+    const conversationList = computed(() => {
+      return conversationStore.conversationList;
+    });
     const router = useRouter();
 
-    const conversationList = ref([]);
-
     function onChat(toId, type, name) {
+      const conversationId = `0_${userStore.getUserId()}_${toId}`;
+      conversationStore.resetNoReadCount(conversationId, APP_ID);
       if (type == ConversationTypeEnum.p2p)
         router.push({
           path: `/message/${toId}`,
@@ -85,21 +106,6 @@ export default {
         router.push({
           path: `/group/list/${toId}`,
         });
-      }
-    }
-    async function getConversation() {
-      const param = {
-        appId: APP_ID,
-        fromId: userStore.getUserId(),
-      };
-      try {
-        const { code, msg, data } = await getConversationApi(param);
-        if (code !== 0) {
-          return;
-        }
-        conversationList.value = data;
-      } catch (e) {
-      } finally {
       }
     }
 
@@ -117,9 +123,15 @@ export default {
         router.push("/friend/find");
       }
     }
-    getConversation();
-
-    return { conversationList, onChat, actions, onAddSelect, showPopover };
+    return {
+      conversationList,
+      onChat,
+      actions,
+      onAddSelect,
+      showPopover,
+      MESSAGE_TYPE,
+      getDHM,
+    };
   },
 };
 </script>

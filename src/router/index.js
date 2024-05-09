@@ -110,6 +110,11 @@ const routes = [
     component: () => import("@/views/group/AddGroup.vue"),
   },
   {
+    path: "/group/join",
+    name: "joinGroup",
+    component: () => import("@/views/group/JoinGroupReq.vue"),
+  },
+  {
     path: "/group/setting/:id",
     name: "GroupSetting",
     component: () => import("@/views/group/GroupSetting.vue"),

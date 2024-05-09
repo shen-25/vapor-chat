@@ -149,6 +149,20 @@ export default class UseImClient {
           ) {
             useImClient.listeners.onUserMutualLoginEvent(msgBody);
           }
+        } else if (command === MessageCommand.MSG_ACK) {
+          const msgJson = JSON.parse(msgBody);
+          const data = msgJson.data;
+          const message = data.data;
+          const pack = {
+            messageId: message.messageId,
+            fromId: this.userId,
+            toId: message.fromId,
+            sequence: message.messageSequence,
+            // 单聊会话
+            type: 0,
+            serverSend: message.serverSend,
+          };
+          this.sendMessageReceiveAck(pack);
         }
       };
 
@@ -258,6 +272,7 @@ export default class UseImClient {
       .int32(command)
       .int32(this.version)
       .int32(this.clientType)
+      // 消息类型
       .int32(0x0)
       .int32(this.appId)
       .int32(this.imeiLength)
@@ -298,6 +313,28 @@ export default class UseImClient {
     );
     return messagePack;
   }
+  /**
+   * 发送消息接受ack
+   */
+  sendMessageReceiveAck(message) {
+    const pack = useImClient.buildMessagePack(
+      MessageCommand.MSG_RECEIVE_ACK,
+      message
+    );
+    if (this.connect) {
+      this.connect.send(pack.pack(false));
+    }
+  }
+  /**
+   * 发送已读消息
+   */
+  sendReadMessage(message) {
+    const pack = useImClient.buildMessagePack(MessageCommand.MSG_READ, message);
+    if (this.connect) {
+      this.connect.send(pack.pack(false));
+    }
+  }
+
   sendP2PMessage(pack) {
     let p2pPack = useImClient.buildMessagePack(MessageCommand.MSG_P2P, pack);
     if (this.connect) {

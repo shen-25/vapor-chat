@@ -20,9 +20,9 @@
       </div>
       <Scroll
         class="me-content"
-        :probe-type="3"
         @scroll="onScroll"
-        ref="scrollRef "
+        ref="scrollRef"
+        :probe-type="3"
       >
         <div>
           <div class="desc">
@@ -78,14 +78,14 @@
                     src="../../assets/images/icon/me/man.png"
                     alt=""
                   />
-                  <span>11岁</span>
+                  <span>{{ getAge() }}岁</span>
                 </div>
                 <div class="item">
                   {{ userInfo.province + "- " + userInfo.city }}
                 </div>
                 <div class="item">{{ userInfo.school }}</div>
               </div>
-              <div class="other">
+              <!-- <div class="other">
                 <div class="item">
                   <i class="icon-shop"></i>
                   <span>抖音商城</span>
@@ -104,10 +104,11 @@
                   <i class="icon-navigation"></i>
                   <span>查看更多</span>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
           <Indicator
+            @click.stop
             :tabTexts="tabTexts"
             v-model:currentTabIndex="currentTabIndex"
           >
@@ -270,6 +271,13 @@ export default {
           const { code, msg, data } = await getMyWorkListApi(param);
           tmpCode = code;
           tempData = data;
+        } else if (currentTabIndex.value == 1) {
+          const { code, msg, data } = await getMyWorkListApi({
+            ...param,
+            privateFlag: 1,
+          });
+          tmpCode = code;
+          tempData = data;
         } else if (currentTabIndex.value == 2) {
           const { code, msg, data } = await getWorkLikedPageListApi(param);
           tmpCode = code;
@@ -302,6 +310,13 @@ export default {
         let tempData;
         if (currentTabIndex.value == 0) {
           const { code, msg, data } = await getMyWorkListApi(param);
+          tmpCode = code;
+          tempData = data;
+        } else if (currentTabIndex.value == 1) {
+          const { code, msg, data } = await getMyWorkListApi({
+            ...param,
+            privateFlag: 1,
+          });
           tmpCode = code;
           tempData = data;
         } else if (currentTabIndex.value == 2) {
@@ -367,6 +382,22 @@ export default {
     function toSearch() {
       router.push("/friend/find");
     }
+    function getAge() {
+      //创建系统日期
+      var today = new Date();
+      //把出生日期转换成日期
+      var birthDate = new Date(userInfo.value.birthday);
+      //分别获取到年份后相减
+      var age = today.getFullYear() - birthDate.getFullYear();
+      //获取到月份后相减
+      var m = today.getMonth() - birthDate.getMonth();
+      //如果月份的结果小于0，或者日期相减的结果是小于0，年龄减去1
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      //计算完成返回结果
+      return age;
+    }
 
     return {
       slideRowListStyle,
@@ -388,6 +419,7 @@ export default {
       getSignature,
       uerStatistics,
       toSearch,
+      getAge,
     };
   },
 };

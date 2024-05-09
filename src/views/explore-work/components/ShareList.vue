@@ -1,5 +1,5 @@
 <template>
-  <div class="add-group-container">
+  <div class="add-share-container">
     <div class="header">
       <div class="left" @click="cancel">取消</div>
       <div class="middle">分享至</div>
@@ -133,17 +133,17 @@ export default {
   },
 };
 </script>
-
 <style lang="scss" scoped>
-.add-group-container {
+.add-share-container {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
+  z-index: 1000;
+
   background: #fff;
   font-size: 16rem;
-  z-index: 200;
   .cell-left {
     display: flex;
     align-items: center;
@@ -163,11 +163,13 @@ export default {
   }
 
   .header {
+    background: #fff;
     height: 48rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: 0 16rem 4rem 16rem;
+
     .left {
       font-size: 16rem;
     }

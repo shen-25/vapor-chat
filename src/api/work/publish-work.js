@@ -8,10 +8,10 @@ const WorkPostAPi = {
   getVideoWorkDetail: "/work/workPost/video/getDetail",
   getWorkLikedPageList: "/work/workPost/get/like",
   getWorkCollectPageList: "/work/workPost/get/collect",
+  getFollowWorkList: "/work/workPost/follow",
 };
 
 /**
- * 用户登录
  * @param {*} data 登录参数
  */
 export function workPublishApi(data) {
@@ -48,7 +48,11 @@ export function getWorkListApi(param) {
     params: param,
   });
 }
-
+export function getFollowWorkListApi(param) {
+  return request.get(WorkPostAPi.getFollowWorkList, {
+    params: param,
+  });
+}
 export function getWorkPostDetailApi(param) {
   return request.get(WorkPostAPi.getPostDetail, {
     params: param,

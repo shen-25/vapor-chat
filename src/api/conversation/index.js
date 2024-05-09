@@ -4,6 +4,7 @@ const ConversationApi = {
   addConversation: "/v1/conversation/add",
   getConversation: "/v1/conversation/get",
   updateConversation: "/v1/conversation/update",
+  getNoReadMessageCount: "/v1/conversation/get/noRead/count",
 };
 
 /**
@@ -28,4 +29,8 @@ export function updateConversationApi(data) {
   return request.post(ConversationApi.updateConversation, {
     data,
   });
+}
+
+export function getNoReadMessageCountApi(param) {
+  return request.get(ConversationApi.getNoReadMessageCount, { params: param });
 }

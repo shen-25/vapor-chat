@@ -28,6 +28,7 @@ import {
   Radio,
   RadioGroup,
   Notify,
+  Toast,
 } from "vant";
 
 import { useImClient } from "./im/core/use-im-client";
@@ -57,5 +58,5 @@ app.use(ShareSheet);
 app.use(Radio);
 app.use(RadioGroup);
 app.use(Notify);
-
+app.use(Toast);
 app.use(Button).use(DatePicker).use(Popup).use(Area).mount("#app");

@@ -13,7 +13,9 @@
     </div>
     <div class="right">
       <div class="follow" @click="onFanBtn">
-        <div class="text" :class="isFan ? ' text-fan' : ''">关注</div>
+        <div class="text" :class="isFan ? ' text-fan' : ''" v-if="!isMe">
+          关注
+        </div>
       </div>
       <div class="share" @click="onShare">
         <i class="icon-share"></i>
@@ -137,6 +139,9 @@ export default {
       if (code == 0) {
         this.isFan = data.isFan;
       }
+    },
+    isMe() {
+      return this.headerData.userId == this.userStore.getUserId();
     },
   },
 };

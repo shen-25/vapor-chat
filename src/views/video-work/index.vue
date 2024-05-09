@@ -1,6 +1,6 @@
 <template>
   <div class="video-work-container">
-    <Header :videoWorkVO="videoWorkVO" v-if="videoWorkVO"></Header>
+    <Header v-show="showHeader"></Header>
     <div class="slide-vertical-wrapper" ref="rootRef">
       <div class="slide-vertical-content">
         <div class="slide-page">
@@ -46,11 +46,13 @@
                 <span>{{ statistics.collectCount }}</span>
               </div>
             </div>
-            <div class="item" @click="onShareBtn">
-              <div class="share">
-                <i class="icon-video-share"></i>
-                <span>{{ statistics.shareCount }}</span>
-              </div>
+            <div class="item">
+              <Share
+                :videoWorkVO="videoWorkVO"
+                v-if="videoWorkVO"
+                @onShare="onShareBtn"
+                @onFinish="onFinishBtn"
+              ></Share>
             </div>
           </div>
         </div>
@@ -89,7 +91,7 @@
 <script>
 import Player from "@/components/player/Player.vue";
 import { getVideoWorkDetailApi } from "@/api/work/publish-work";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { addCollectApi, deleteCollectApi } from "@/api/interact/collect";
@@ -101,17 +103,22 @@ import { APP_ID } from "@/config/setting";
 import useVideoSlider from "./use-video-slider";
 import Comment from "@/views/explore-work/components/Comment.vue";
 import { addCommentApi, getCommentListApi } from "@/api/comment/index";
+import Share from "./components/Share.vue";
 import Header from "./components/Header.vue";
+
 export default {
   name: "VideoWork",
   components: {
     Player,
     Comment,
+    Share,
     Header,
   },
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
+
+    const showHeader = ref(true);
 
     const playerRef = ref({});
 
@@ -134,7 +141,6 @@ export default {
       console.log(newIndex);
     });
     function isMe() {
-      console.log(author.value.userId == userStore.getUserId());
       return author.value.userId == userStore.getUserId();
     }
 
@@ -242,8 +248,12 @@ export default {
         statistics.value.collectCount++;
       }
     }
-    function onShareBtn() {}
-
+    function onShareBtn() {
+      showHeader.value = false;
+    }
+    function onFinishBtn() {
+      showHeader.value = true;
+    }
     const showInputDiv = ref(false);
 
     const commentList = ref([]);
@@ -268,7 +278,7 @@ export default {
       await getCommentList();
       showComment.value = true;
       replyCommentModel.value = null;
-      placeholder.value = "";
+      placeholder.value = "说点什么...";
     }
     function showClosedToast() {
       placeholder.value = "";
@@ -298,6 +308,7 @@ export default {
       const { msg, data, code } = await addCommentApi(param);
       if (code == 0) {
         showInputDiv.value = false;
+        statistics.value.commentCount++;
         if (type == 0) {
           document.getElementById("content-textarea").innerText = "";
           getCommentList();
@@ -306,6 +317,9 @@ export default {
     }
     async function onSendBtn() {
       const p = document.getElementById("content-textarea");
+      if (!p.innerText) {
+        return;
+      }
       if (replyCommentModel.value?.commentId) {
         addComment(p.innerText, 0, replyCommentModel.value.commentId);
       } else {
@@ -314,6 +328,7 @@ export default {
       replyCommentModel.value = null;
       placeholder.value = "";
     }
+
     getVideoWorkDetail();
     return {
       playerRef,
@@ -339,6 +354,8 @@ export default {
       showClosedToast,
       isMe,
       showAddFanBtn,
+      showHeader,
+      onFinishBtn,
     };
   },
 };
@@ -569,24 +586,6 @@ export default {
               }
               span {
                 padding-top: 2rem;
-                font-size: 18rem;
-              }
-            }
-            .share {
-              display: flex;
-              align-items: center;
-              flex-direction: column;
-              justify-content: space-between;
-              transform: translate3d(0px, 0px, 0px);
-              opacity: 1;
-              width: 46rem;
-              height: 52rem;
-              .icon-video-share {
-                font-size: 34rem;
-              }
-              span {
-                padding-top: 2rem;
-
                 font-size: 18rem;
               }
             }

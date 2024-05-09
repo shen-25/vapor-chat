@@ -3,7 +3,7 @@
     <div class="header">
       <div class="left">
         <Back @click="back()" />
-        <div class="badge"></div>
+        <div class="badge">{{ totalNoReadCount }}</div>
         <div class="name">{{ name }}</div>
       </div>
       <div class="right">
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="main">
-      <Scroll class="chat-content" :bounce="true">
+      <Scroll class="chat-content" ref="scrollRef" :bounce="true">
         <div>
           <ChatMessage
             v-for="(item, index) in messageList"
@@ -19,6 +19,7 @@
             :key="item"
             :class="getChatCls(index)"
           ></ChatMessage>
+          <div id="scrollTip"></div>
         </div>
       </Scroll>
     </div>
@@ -55,14 +56,14 @@ import Back from "@/components/base/back/Back.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import ChatMessage from "./ChatMessage.vue";
-import { ref, inject, onMounted, computed, watch } from "vue";
+import { ref, inject, onMounted, computed, watch, nextTick } from "vue";
 import WebToolkit from "@/im/utils/web-tool-kit";
 import { MESSAGE_TYPE } from "./use-chat.js";
 import { getP2PMessageApi } from "@/api/message/message";
 import { useUserStore } from "@/store/user";
 import { APP_ID } from "@/config/setting";
 import FileUploader from "@/components/file-uploader";
-
+import { useConversationStore } from "@/store/conversation";
 export default {
   name: "chat",
 
@@ -74,9 +75,12 @@ export default {
     Scroll,
   },
   setup(props, { emit }) {
+    const scrollRef = ref(null);
     const router = useRouter();
 
     const userStore = useUserStore();
+
+    const conversationStore = useConversationStore();
 
     const imSdk = inject("$imSdk");
 
@@ -87,10 +91,21 @@ export default {
 
     const isTextInput = ref(false);
 
-    const name = ref(router.currentRoute.value.query.name);
+    const name = computed(() => {
+      const conversationId = `0_${userStore.getUserId()}_${
+        router.currentRoute.value.params.id
+      }`;
+      return conversationStore.getConversationUserName(conversationId, APP_ID);
+    });
+
+    const totalNoReadCount = computed(() => {
+      const conversationId = `0_${userStore.getUserId()}_${
+        router.currentRoute.value.params.id
+      }`;
+      return conversationStore.getTotalNoReadCount(conversationId, APP_ID);
+    });
 
     watch(messageText, (newText) => {
-      console.log(newText);
       if (newText && newText != "") {
         isTextInput.value = true;
       } else {
@@ -119,16 +134,18 @@ export default {
             messageList.value.push(element);
           }
         });
+        scrollToBottom();
       }
     }
 
     async function onSendMessage(msgType) {
       // 发送文本消息
+      const toId = router.currentRoute.value.params.id;
+
       if (msgType === MESSAGE_TYPE.TEXT) {
         if (messageText.value == "" || messageText.value == undefined) {
           return;
         }
-        const friendId = router.currentRoute.value.params.id;
         const msg = {
           type: MESSAGE_TYPE.TEXT,
           data: messageText.value,
@@ -142,16 +159,16 @@ export default {
         // 构造数据格式
         imSdk.sendP2PMessage(
           imSdk.createP2PTextMessage(
-            friendId,
+            toId,
             messageText.value,
             userStore.getAvatar()
           )
         );
         messageText.value = "";
+        scrollToBottom();
       }
       // 发送帖子分享
       if (msgType == MESSAGE_TYPE.SharePost) {
-        const toId = router.currentRoute.value.params.id;
         const postWork = {
           postId: "1775150487142928384",
           title: "美丽的大自然",
@@ -188,7 +205,6 @@ export default {
         if (!imageUrl.value) {
           return;
         }
-        const toId = router.currentRoute.value.params.id;
         const msg = {
           type: MESSAGE_TYPE.Image,
           data: imageUrl.value,
@@ -210,12 +226,23 @@ export default {
         );
         imageUrl.value = "";
       }
+      const conversationId = `0_${userStore.getUserId()}_${toId}`;
+      conversationStore.resetNoReadCount(conversationId, APP_ID);
     }
 
     async function onListenMessage(msgPack) {
       console.log("单聊监听接收聊天信息", msgPack);
+
       const data = msgPack.data;
       const messageBody = JSON.parse(data.messageBody);
+      const conversationId = `0_${msgPack.toId}_${data.fromId}`;
+      conversationStore.updateConversation(
+        conversationId,
+        APP_ID,
+        1,
+        messageBody,
+        data.messageTime
+      );
       // 文本消息
       if (messageBody.type == MESSAGE_TYPE.TEXT) {
         const msg = {
@@ -255,6 +282,19 @@ export default {
         };
         messageList.value.push(msg);
       }
+      // 发送已读消息;
+      const pack = {
+        messageId: data.messageId,
+        fromId: data.toId,
+        toId: data.fromId,
+        messageSequence: data.messageSequence,
+        // 单聊会话
+        type: 0,
+      };
+      sendReadMessageAck(pack);
+    }
+    function sendReadMessageAck(pack) {
+      imSdk.sendReadMessage(pack);
     }
     function back() {
       if (window.history.length <= 1) {
@@ -268,7 +308,7 @@ export default {
       if (index == 0) {
         return "pad-top-20rem";
       } else if (index == messageList.value.length - 1) {
-        return "pad-bottom-20rem";
+        return "";
       } else {
         return "";
       }
@@ -288,8 +328,19 @@ export default {
       onSendMessage(MESSAGE_TYPE.Image);
     }
 
+    async function scrollToBottom() {
+      if (!scrollRef.value?.scroll) {
+        return;
+      }
+      await nextTick();
+      scrollRef.value.scroll.refresh();
+      scrollRef.value.scroll.scrollToElement("#scrollTip", 200, true, true);
+    }
+
     getP2PMessageData();
+
     return {
+      scrollRef,
       MESSAGE_TYPE,
       back,
       messageList,
@@ -303,6 +354,7 @@ export default {
       clickSendOther,
       getUploadFile,
       name,
+      totalNoReadCount,
     };
   },
 };
@@ -310,6 +362,9 @@ export default {
 <style lang="scss" scoped>
 .file-uploader {
   width: 40rem;
+}
+#scrollTip {
+  height: 10rem;
 }
 .chat-container {
   position: fixed;

@@ -3,64 +3,64 @@ const MessageCommand = {
 
   MSG_P2P_SYNC: 0x454,
 
-  //发送消息已读   1106
-  MSG_READED: 0x452,
+  //发送消息已读
+  MSG_READ: 1106,
 
   //消息接收ack
-  MSG_RECIVE_ACK: 1107,
+  MSG_RECEIVE_ACK: 1107,
 
-  //单聊消息ACK 1046
-  MSG_ACK: 0x416,
+  //单聊消息ACK
+  MSG_ACK: 1046,
 
-  // 消息撤回 1050
-  MSG_RECALL: 0x41a,
+  // 消息撤回
+  MSG_RECALL: 1050,
 
-  // //消息撤回通知 1052
-  MSG_RECALL_NOTIFY: 0x41c,
+  // //消息撤回通知
+  MSG_RECALL_NOTIFY: 1052,
 
-  // 消息撤回回包 1051
-  MSG_RECALL_ACK: 0x41b,
+  // 消息撤回回包
+  MSG_RECALL_ACK: 1051,
 
-  // //消息已读通知 1053
-  MSG_READED_NOTIFY: 0x41d,
+  // 消息已读通知
+  MSG_READ_NOTIFY: 1053,
 };
 
 const FriendShipCommand = {
-  //添加好友 3000
-  FRIEND_ADD: 0xbb8,
+  //添加好友
+  FRIEND_ADD: 3000,
 
-  //更新好友 3001
-  FRIEND_UPDATE: 0xbb9,
+  //更新好友
+  FRIEND_UPDATE: 3001,
 
-  //删除好友 3002
-  FRIEND_DELETE: 0xbba,
+  //删除好友
+  FRIEND_DELETE: 3002,
 
-  //好友申请 3003
-  FRIEND_REQUEST: 0xbbb,
+  //好友申请
+  FRIEND_REQUEST: 3003,
 
-  //好友申请已读 3004
-  FRIEND_REQUEST_READ: 0xbbc,
+  //好友申请已读
+  FRIEND_REQUEST_READ: 3004,
 
-  //好友申请审批 3005
-  FRIEND_REQUEST_APPROVER: 0xbbd,
+  //好友申请审批
+  FRIEND_REQUEST_APPROVER: 3005,
 
-  //添加黑名单 3010
-  FRIEND_BLACK_ADD: 0xbc2,
+  //添加黑名单
+  FRIEND_BLACK_ADD: 3010,
 
-  //移除黑名单 3011
-  FRIEND_BLACK_DELETE: 0xbc3,
+  //移除黑名单
+  FRIEND_BLACK_DELETE: 3011,
 
-  //新建好友分组 3012
-  FRIEND_GROUP_ADD: 0xbc4,
+  //新建好友分组
+  FRIEND_GROUP_ADD: 3012,
 
-  //删除好友分组 3013
-  FRIEND_GROUP_DELETE: 0xbc5,
+  //删除好友分组
+  FRIEND_GROUP_DELETE: 3013,
 
-  //好友分组添加成员 3014
-  FRIEND_GROUP_MEMBER_ADD: 0xbc6,
+  //好友分组添加成员
+  FRIEND_GROUP_MEMBER_ADD: 3014,
 
-  //好友分组移除成员 3015
-  FRIEND_GROUP_MEMBER_DELETE: 0xbc7,
+  //好友分组移除成员
+  FRIEND_GROUP_MEMBER_DELETE: 3015,
 };
 
 const GroupCommand = {
@@ -117,7 +117,7 @@ const GroupCommand = {
   /**
    * 禁言/解禁 群成员 2010，通知管理员和被操作人
    */
-  SPEAK_GOUP_MEMBER: 0x7da,
+  SPEAK_Group_MEMBER: 0x7da,
 
   //群聊消息收发   2104
   MSG_GROUP: 0x838,
@@ -164,10 +164,10 @@ const UserEventCommand = {
 };
 
 const ConversationEventCommand = {
-  //5000 会话删除
-  CONVERSATION_DELETE: 0x1388,
-  //5001 会话修改
-  CONVERSATION_UPDATE: 0x1389,
+  // 会话删除
+  CONVERSATION_DELETE: 5000,
+  // 会话修改
+  CONVERSATION_UPDATE: 5001,
 };
 
 export {

@@ -23,7 +23,9 @@
             </div>
           </div>
           <div class="comment-content">
-            <div class="total">共100条评论</div>
+            <div class="total">
+              共{{ workDetail?.statistics?.commentCount }}条评论
+            </div>
             <div @click.stop>
               <Comment
                 :commentList="commentList"
@@ -164,6 +166,7 @@ export default {
           document.getElementById("content-textarea").innerText = "";
           getCommentList();
         }
+        workDetail.value.statistics.commentCount++;
       }
     }
 
@@ -199,6 +202,7 @@ export default {
       };
       showInputDiv.value = !showInputDiv.value;
     }
+
     getWorkPostDetail(router.currentRoute.value.params.id);
 
     async function addCollect() {

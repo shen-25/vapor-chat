@@ -9,6 +9,7 @@ const GroupApi = {
 
   transferGroup: "/v1/group/transfer",
   searchGroup: "/v1/group/search",
+  joinGroupReq: "/join/group/req",
 };
 
 /**
@@ -62,4 +63,10 @@ export function transferGroupApi(data) {
  */
 export function searchGroupApi(param) {
   return request.get(GroupApi.searchGroup, { params: param });
+}
+/**
+ * 申请加入群聊
+ */
+export function joinGroupReqApi(data) {
+  return request.post(GroupApi.joinGroupReq, data);
 }

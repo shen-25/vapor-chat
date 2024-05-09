@@ -46,7 +46,7 @@ export default {
   justify-content: space-between;
   font-weight: bold;
   .tab {
-    width: 45%;
+    width: 50%;
     display: flex;
     justify-content: center;
     align-items: center;

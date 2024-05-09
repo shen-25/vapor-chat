@@ -1,7 +1,7 @@
 <template>
   <div class="like-container">
     <i :class="iconClass"></i>
-    <span class="count" @click="onLikeBtn">{{ count }}</span>
+    <span class="count" @click.stop="onLikeBtn">{{ count }}</span>
   </div>
 </template>
 
