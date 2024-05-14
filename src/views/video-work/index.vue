@@ -52,6 +52,7 @@
                 v-if="videoWorkVO"
                 @onShare="onShareBtn"
                 @onFinish="onFinishBtn"
+                @onCancel="onCancelBtn"
               ></Share>
             </div>
           </div>
@@ -254,6 +255,9 @@ export default {
     function onFinishBtn() {
       showHeader.value = true;
     }
+    function onCancelBtn() {
+      showHeader.value = true;
+    }
     const showInputDiv = ref(false);
 
     const commentList = ref([]);
@@ -356,6 +360,7 @@ export default {
       showAddFanBtn,
       showHeader,
       onFinishBtn,
+      onCancelBtn,
     };
   },
 };

@@ -82,7 +82,7 @@ export default class UseImClient {
     if (ObjUtil.isEmpty(this.url)) {
       // websocket地址为空,走登录逻辑
       // TODO 这里写死先
-      let ip = "127.0.0.1";
+      let ip = "10.62.82.120";
       let port = 19000;
       this.url = "ws://" + ip + ":" + port + "/ws";
     }

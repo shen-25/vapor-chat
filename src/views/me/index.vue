@@ -13,9 +13,9 @@
         </transition>
 
         <div class="right">
-          <div class="item">
+          <!-- <div class="item">
             <i class="icon-share"></i>
-          </div>
+          </div> -->
         </div>
       </div>
       <Scroll

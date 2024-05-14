@@ -76,7 +76,8 @@
                     src="../../assets/images/icon/me/man.png"
                     alt=""
                   />
-                  <span>难</span>
+                  <span v-if="userInfo.sex == 1">男</span>
+                  <span v-if="userInfo.sex == 2">女</span>
                 </div>
                 <div class="item" v-if="userInfo.province">
                   {{ userInfo.province + "-" + userInfo.city }}

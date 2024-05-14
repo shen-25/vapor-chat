@@ -116,7 +116,7 @@ export default {
       title: "",
       text: "",
       location: "东莞",
-      privateFlag: 1,
+      privateFlag: 0,
     });
     const locationResult = ref("东莞");
     const visibleResult = ref("公开可见");
@@ -137,8 +137,8 @@ export default {
       { text: "湖州", value: "huzhou" },
     ];
     const visibleColumns = [
-      { text: "公开可见", value: "0" },
-      { text: "仅自己可见", value: "1" },
+      { text: "公开可见", value: 0 },
+      { text: "仅自己可见", value: 1 },
     ];
 
     const onLocationConfirm = ({ selectedOptions }) => {

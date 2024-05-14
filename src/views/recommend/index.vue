@@ -1,7 +1,7 @@
 <template>
   <div class="recommend-container">
-    <div class="header">
-      <div class="left">
+    <div class="header" v-show="!showSearch">
+      <div class="left" @click="toLogin">
         <i class="icon-nav"></i>
       </div>
       <Indicator
@@ -13,6 +13,9 @@
       <div class="search" @click="onSearchBtn">
         <i class="icon-search"></i>
       </div>
+    </div>
+    <div class="search-container" v-show="showSearch">
+      <SearchInputVue v-model="keyword" />
     </div>
     <Scroll class="content" :click="false">
       <div class="scroll" ref="rootRef">
@@ -26,17 +29,17 @@
 
 <script>
 import Indicator from "@/components/slide/Indicator";
-
+import SearchInputVue from "./components/SearchInput.vue";
 import Footer from "@/components/footer/Footer.vue";
 import Preview from "@/components/preview/index.vue";
 import Scroll from "@/components/base/scroll/Scroll";
 import { useRouter } from "vue-router";
 import { getWorkListApi, getFollowWorkListApi } from "@/api/work/publish-work";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import usePullUpLoad from "@/components/base/pull-up/use-pull-up-load";
 import { useUserStore } from "@/store/user";
 export default {
-  components: { Footer, Preview, Scroll, Indicator },
+  components: { Footer, Preview, Scroll, Indicator, SearchInputVue },
   setup() {
     const tabTexts = [
       {
@@ -54,6 +57,8 @@ export default {
     const userStore = useUserStore();
 
     const workPostList = ref([]);
+
+    const showSearch = ref(false);
 
     // requestModel
     const page = ref(1);
@@ -86,6 +91,7 @@ export default {
     async function searchFirst() {
       page.value = 1;
       pageSize.value = 10;
+      workPostList.value = [];
       let tmpCode = 1;
       let tempData;
       try {
@@ -120,6 +126,17 @@ export default {
       } finally {
       }
     }
+
+    watch(keyword, async (newQuery) => {
+      if (newQuery) {
+        await nextTick();
+        searchFirst();
+      }
+      if (newQuery == "") {
+        showSearch.value = false;
+        searchFirst();
+      }
+    });
 
     async function searchMore() {
       let tmpCode = 1;
@@ -149,7 +166,7 @@ export default {
           return;
         }
         // 修改页码和数据总条数、表格赋值
-        workPostList.value = tempData.list || [];
+        workPostList.value = workPostList.value.concat(tempData.list || []);
         isLastPage.value = tempData.isLastPage;
         page.value = page.value + 1;
       } catch (e) {
@@ -173,9 +190,26 @@ export default {
       }
     }
 
+    function onSearchBtn() {
+      showSearch.value = true;
+      workPostList.value = [];
+    }
     searchFirst();
+    function toLogin() {
+      router.push("/login");
+    }
 
-    return { workPostList, selectWork, rootRef, tabTexts, currentTabIndex };
+    return {
+      workPostList,
+      selectWork,
+      rootRef,
+      tabTexts,
+      currentTabIndex,
+      onSearchBtn,
+      showSearch,
+      keyword,
+      toLogin,
+    };
   },
 };
 </script>
@@ -217,6 +251,14 @@ export default {
         font-size: $font-size-large-x;
       }
     }
+  }
+  .search-container {
+    border-bottom: 0.6px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    height: 44rem;
+    text-align: center;
+    margin: 10rem 10rem 0rem 10rem;
   }
   .content {
     height: 100%;

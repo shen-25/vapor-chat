@@ -6,6 +6,7 @@
       title="立即分享给好友"
       :options="options"
       @select="onSelect"
+      @cancel="onCancel"
     />
     <ShareList
       @cancel="cancel"
@@ -40,10 +41,9 @@ export default {
   data() {
     return {
       options: [
-        { name: "私信好友", icon: "wechat" },
+        { name: "分享", icon: "link" },
+        { name: "微信", icon: "wechat" },
         { name: "微博", icon: "weibo" },
-        { name: "复制链接", icon: "link" },
-        { name: "分享海报", icon: "poster" },
         { name: "二维码", icon: "qrcode" },
       ],
       showShare: false,
@@ -58,6 +58,9 @@ export default {
     onShare() {
       this.showShare = true;
       this.$emit("onShare");
+    },
+    onCancel() {
+      this.$emit("onCancel");
     },
     onSelect(option) {
       if (option.name == "私信好友") {
