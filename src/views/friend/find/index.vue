@@ -48,11 +48,11 @@ export default {
   setup() {
     const router = useRouter();
     const showFindStyle = ref(false);
-    const placeholder = ref("昵称/手机号");
+    const placeholder = ref("昵称/邮箱");
     const searchType = ref(1);
     function onFindBtn(val) {
       if (val == 1) {
-        placeholder.value = "昵称/手机号";
+        placeholder.value = "昵称/邮箱";
       } else {
         placeholder.value = "搜索群号/群名称";
       }

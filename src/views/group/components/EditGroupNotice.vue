@@ -8,7 +8,6 @@
     <div class="notice">
       <van-cell-group inset>
         <van-field
-          v-model="notice"
           rows="8"
           autosize
           type="textarea"

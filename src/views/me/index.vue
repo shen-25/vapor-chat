@@ -46,10 +46,10 @@
                     <span class="num">{{ uerStatistics.likeCount }}</span>
                     <span>获赞</span>
                   </div>
-                  <div class="text">
+                  <!-- <div class="text">
                     <span class="num">{{ uerStatistics.friendCount }}</span>
                     <span>朋友</span>
-                  </div>
+                  </div> -->
                   <div class="text">
                     <span class="num">{{ uerStatistics.followCount }}</span>
                     <span>关注</span>
